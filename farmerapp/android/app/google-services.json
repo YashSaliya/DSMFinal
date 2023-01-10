@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "841168642654",
+    "firebase_url": "https://ng-test-fb229-default-rtdb.firebaseio.com",
+    "project_id": "ng-test-fb229",
+    "storage_bucket": "ng-test-fb229.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:841168642654:android:ed6fed489d0392d3a88acf",
+        "android_client_info": {
+          "package_name": "com.example.farmerapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "841168642654-1laje7efbaq3cng48tg49g0p89s9su6f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-K3DxBe5h-tgMYr6LLoeJqyf3ogQNwLU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "841168642654-1laje7efbaq3cng48tg49g0p89s9su6f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

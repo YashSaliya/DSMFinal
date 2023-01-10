@@ -2,7 +2,7 @@ from django.shortcuts import render
 import firebase_admin
 from firebase_admin import firestore
 
-cred = firebase_admin.credentials.Certificate("C://Users//yashs//Documents//DSMFinal//dsm//certificate.json")
+cred = firebase_admin.credentials.Certificate("certificate.json")
 
 app = firebase_admin.initialize_app(cred)
 
