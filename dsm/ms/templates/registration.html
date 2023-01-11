@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %} Register {% endblock %}
+
+{% block content %}
+    <form name = "MsRegistration" action ="{% url 'register' %}" method = "POST">
+        {% csrf_token %}
+        {{form}}
+        <br>
+        <button type="submit" class = "btn btn-primary" >Register</button>
+    </form>
+
+
+{% endblock %}
+
+{% block css %}
+
+<style>
+    form {
+        width: 50%;
+        margin: 0 auto;
+        padding: 2%;
+    }
+
+</style>
+
+{% endblock %}

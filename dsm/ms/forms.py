@@ -1,4 +1,7 @@
-import forms
+
+from django import forms
+import firebase_admin
+from firebase_admin import firestore
 
 indianStates = [
 ('Andhra Pradesh', 'Andhra Pradesh'),
@@ -39,6 +42,7 @@ indianStates = [
 ('Ladakh', 'Ladakh'),
 ]
 
+
 class MsRegistration(forms.Form):
     username = forms.CharField(max_length = 100)
     password = forms.CharField(widget = forms.PasswordInput)
@@ -50,10 +54,18 @@ class MsRegistration(forms.Form):
     minFatPercentCow = forms.FloatField()
     minFatPercentBuffalo = forms.FloatField()
 
-    def __init__(self,*args,**kwargs):
+    def __init__(self:forms.Form,*args,**kwargs):
+        super(MsRegistration,self).__init__(*args,**kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
 
-    
+    def clean(self):
+        from .views import db
+        cleaned_data = super().clean()
+        username = cleaned_data.get('username')
+        doc_ref = db.collection(u'MilkSocieties').document(username)
+        if doc_ref.get().exists:
+            raise forms.ValidationError("Username already exists")
+        return cleaned_data
 
 
