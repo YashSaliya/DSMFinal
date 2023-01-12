@@ -39,6 +39,8 @@ dependencies:
   firebase_auth: ^3.4.2
   firebase_core_platform_interface: 4.5.1
   shared_preferences: any
+  csc_picker: ^0.2.6
+  image_picker: ^0.8.6
   pinput: any
 
   

@@ -54,14 +54,6 @@ class RegisterForm(forms.Form):
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
 
-    def clean(self):
-        from .views import db
-        cleaned_data = super().clean()
-        email = cleaned_data['email']
-        doc_ref = db.collection(u'MilkSocieties').document(email)
-        if doc_ref.get().exists:
-            raise forms.ValidationError("Email already exists Please Go To Login Page")
-        return cleaned_data
 
         
 

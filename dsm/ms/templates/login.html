@@ -4,8 +4,10 @@
 
 {% block content %}
 {% csrf_token %}
-<form name = "Register" method = "POST" action = "{% url 'register' %}"> 
- 
+
+<form name = "Register" method = "POST" action = "{% url 'login' %}"> 
+  {% csrf_token %}
+
   {% for field in form %}
   <div class = "form-group row">
     <div class="input-group input-group-static mb-4">
@@ -15,15 +17,11 @@
     <span class = "h6" style = "color:red;">{{ field.errors }} </span>
   </div>
  {% endfor %}
- {% csrf_token %}
 <br>
 <div style = "text-align: center;">
-    <button type = "submit" class = "btn btn-primary" >Register</button>
+    <button type = "submit" class = "btn btn-primary" >Login</button>
 </div>
 </form>
-<div class="ima">
-    <a href = "{% url 'login' %}" > Already Registered ? Click here For Login </a>
-</div>
 
 {% endblock %} 
 
