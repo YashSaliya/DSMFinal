@@ -43,29 +43,43 @@ indianStates = [
 ]
 
 
-class MsRegistration(forms.Form):
-    username = forms.CharField(max_length = 100)
-    password = forms.CharField(widget = forms.PasswordInput)
-    address  = forms.CharField(max_length = 200)
-    state = forms.ChoiceField(choices = indianStates)
-    city = forms.CharField(max_length = 100)
-    pincode = forms.IntegerField()
-    storage_capacity = forms.FloatField()
-    minFatPercentCow = forms.FloatField()
-    minFatPercentBuffalo = forms.FloatField()
+
+class RegisterForm(forms.Form):
+    email = forms.EmailField(widget = forms.EmailInput)
+    password = forms.CharField(widget = forms.PasswordInput,min_length=6,max_length=8)
+
 
     def __init__(self:forms.Form,*args,**kwargs):
-        super(MsRegistration,self).__init__(*args,**kwargs)
+        super(RegisterForm,self).__init__(*args,**kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
 
     def clean(self):
         from .views import db
         cleaned_data = super().clean()
-        username = cleaned_data.get('username')
-        doc_ref = db.collection(u'MilkSocieties').document(username)
+        email = cleaned_data['email']
+        doc_ref = db.collection(u'MilkSocieties').document(email)
         if doc_ref.get().exists:
-            raise forms.ValidationError("Username already exists")
+            raise forms.ValidationError("Email already exists Please Go To Login Page")
         return cleaned_data
+
+        
+
+
+class MsRegistration(forms.Form):
+    address  = forms.CharField(max_length = 200)
+    state = forms.ChoiceField(choices = indianStates)
+    city = forms.CharField(max_length = 100)
+    pincode = forms.IntegerField()
+    storage_capacity = forms.FloatField()
+    minFatCow = forms.FloatField()
+    minFatBuffalo = forms.FloatField()
+
+    def __init__(self:forms.Form,*args,**kwargs):
+        super(MsRegistration,self).__init__(*args,**kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class':'form-control'})
+
+    
 
 

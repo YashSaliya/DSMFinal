@@ -3,7 +3,7 @@
 {% block title %} Register {% endblock %}
 
 {% block content %}
-    <form name = "Register" action ="{% url 'register' %}" method = "POST">
+    <form name = "MsRegistration" action ="{% url 'otherdetails' %}" method = "POST">
         {% csrf_token %}
         {{form}}
         <br>
