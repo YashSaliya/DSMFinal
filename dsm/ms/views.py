@@ -8,7 +8,7 @@ cred = firebase_admin.credentials.Certificate("certificate.json")
 app = firebase_admin.initialize_app(cred)
 
 db = firestore.client()
-
+#Hello
 
 # Create your views here.
 def index(request):
