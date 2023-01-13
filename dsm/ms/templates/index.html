@@ -1,18 +1,72 @@
 <!-- Create a simple homepage -->
+{% extends 'base/base.html' %}
+{% load static %}
 
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>My First Web Page</title>
-  </head>
-  <body>
-    <h1>My First Web Page</h1>
-    <p>This is my first web page.</p>
-  </body>
-  {% block js %}
-  <script>
+{% block content %}
+<div class = 'h3'> 
+  Welcome to the homepage
+</div>
 
-  </script>
+Place an logout button at the rightmost 
+<div class = 'float-right'>
+  <a id = "logout" class = 'btn btn-primary'>Logout</a>
+</div>
 
-  {% endblock %}
-</html>
+<script type  = "module">
+  import {app} from "{% static 'material_2_pro_assets/js/firebase.js' %}"
+  import { getAuth,signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+  const auth = getAuth();
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      console.log("User is signed in");
+    }
+    else{
+      console.log("No user is signed in");
+      window.location.replace("{% url 'login' %}")
+    }
+  });
+
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+
+  $("#logout").click(()=>{
+    let csrftoken = getCookie('csrftoken');
+    signOut(auth).then(()=>{
+      console.log("User signed out");
+      fetch("{% url 'logout' %}",{
+        method:POST,
+        headers:{"X-CSRFToken": csrftoken}
+      }).then(
+        (response)=>{
+          console.log(response);
+          if(response.status == 200){
+            console.log("User logged out");
+            window.location.replace("{% url 'login' %}")
+          }
+        }
+      )
+      .catch((error)=>{
+        console.log(error);
+      }
+      );
+      window.location.replace("{% url 'login' %}")
+    }).catch((error)=>{
+      console.log(error);
+    })
+  })
+
+</script>
+
+{% endblock %}

@@ -27,7 +27,8 @@ def login_required(function):
                 decoded_claims = auth.verify_session_cookie(request.session['sessionCookie'], check_revoked=True)
                 request.session['user'] = decoded_claims['uid']
                 return function(request,*args,**kwargs)
-            except:
+            except Exception as e:
+                print(e)
                 return redirect('login')
         else:
             return redirect('login')
