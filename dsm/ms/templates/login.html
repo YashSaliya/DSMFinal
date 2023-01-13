@@ -1,29 +1,107 @@
 
 
-{% extends 'base/loginbase.html' %} {% block title %} Register {% endblock %} 
+{% extends 'base/loginbase.html' %}
+{% load static %}
+{% block title %} Register {% endblock %} 
 
 {% block content %}
-{% csrf_token %}
 
-<form name = "Register" method = "POST" action = "{% url 'login' %}"> 
-  {% csrf_token %}
+<script type ="module">
+  import {app} from "{% static 'material_2_pro_assets/js/firebase.js' %}"
+  import { getAuth,signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
-  {% for field in form %}
+  const auth = getAuth();
+
+  console.log(app);
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      console.log("User is signed in");
+    }
+    else{
+      console.log("No user is signed in");
+    }
+  });
+
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+
+  $("#login").click(()=>{
+    var email = $("#id_email").val();
+    var password = $("#id_password").val();
+    console.log(email);
+    console.log(password);
+    let csrftoken = getCookie('csrftoken');
+    // firebase auth registernewuser
+    signInWithEmailAndPassword(auth,email, password).then((userCredentials)=>{
+      const user = userCredentials.user;
+      user.getIdToken().then((tokenVal)=>{
+        fetch("{% url 'newuser' %}",{
+          method : "POST",
+          body : JSON.stringify({"tokenVal":tokenVal}),
+          headers:{"X-CSRFToken": csrftoken}
+        }).then(
+          (response)=>{
+            console.log(response);
+            if(response.status == 200){
+              console.log("User Created");
+              window.location.replace("{% url 'index' %}")
+            }
+          }
+        )        
+      })
+    });
+    
+  }
+  );
+
+
+</script>
+
+<form name = "Login" class = "card-body bg-white border-circular" action = "#"> 
+ 
   <div class = "form-group row">
     <div class="input-group input-group-static mb-4">
-    {{ field.label_tag }}
-    {{ field }}
+    <label class = "input-group input-group-static mb-4"> Enter Email</label>
+    <input type = "email" class = "form-control" id = "id_email" value = "yashsaliya222002@gmail.com" name = "email" placeholder = "Enter Email" required>
     </div>
-    <span class = "h6" style = "color:red;">{{ field.errors }} </span>
+    <span class = "h6" style = "color:red;"> </span>
+
   </div>
- {% endfor %}
+  <div class = "form-group row">
+    <div class="input-group input-group-static mb-4">
+    <label class = "input-group input-group-static mb-4"> Enter Password</label>
+    <input type = "password" class = "form-control" id = "id_password" value = "yashsaliya" name = "password" placeholder = "Enter Password" required>
+    </div>
+    <span class = "h6" style = "color:red;"></span>
+    
+  </div>
 <br>
-<div style = "text-align: center;">
-    <button type = "submit" class = "btn btn-primary" >Login</button>
-</div>
+
 </form>
+<div style = "text-align: center;" class = "bg-white">
+  <button id = "login" onclick = "f()" class = "btn btn-primary" >Register</button>
+</div>
+<div class="ima">
+    <a href = "{% url 'login' %}" > Already Registered ? Click here For Login </a>
+</div>
+
+
 
 {% endblock %} 
+
+
 
 {% block other_css %}
 

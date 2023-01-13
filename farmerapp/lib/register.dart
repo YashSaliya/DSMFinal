@@ -4,8 +4,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pinput/pinput.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Homescreen.dart';
+import 'home_page.dart';
 
 class Register extends StatelessWidget {
   const Register({Key? key}) : super(key: key);
@@ -318,13 +320,19 @@ class _RegisterPageState extends State<RegisterPage> {
                                                         credential)
                                                     .then(
                                                         (UserCredential value) {
+                                                  SharedPreferences
+                                                          .getInstance()
+                                                      .then((pref) {
+                                                    pref.setString(
+                                                        "userId", value.user!.uid.toString());
+                                                  });
                                                   print(value);
                                                   Navigator.of(context).pop();
                                                   Navigator.of(context).push(
                                                       MaterialPageRoute(
                                                           builder: (BuildContext
                                                                   context) =>
-                                                              const Homepage()));
+                                                              const MyHomePage()));
                                                 });
                                               },
                                             )

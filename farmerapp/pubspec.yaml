@@ -42,6 +42,7 @@ dependencies:
   csc_picker: ^0.2.6
   image_picker: ^0.8.6
   pinput: any
+  cloud_firestore: 3.1.9
 
   
 dev_dependencies:

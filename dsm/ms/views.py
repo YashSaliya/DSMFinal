@@ -20,82 +20,64 @@ app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 
-def my_login_required(function):
+def login_required(function):
     def wrapper(request,*args,**kwargs):
-        pass
+        if 'sessionCookie' in request.session:
+            try:
+                decoded_claims = auth.verify_session_cookie(request.session['sessionCookie'], check_revoked=True)
+                request.session['user'] = decoded_claims['uid']
+                return function(request,*args,**kwargs)
+            except:
+                return redirect('login')
+        else:
+            return redirect('login')
     return wrapper
 
-
-def precheck(request):
-    if 'user' in request.session:
-        uid = request.session['user']
-        user = auth.get_user(uid)
-        if user:
-            return True
-        del request.session['user']
-
-    return False
-
-
-# Create your views here.
+@login_required
 def index(request):
-    users_ref = db.collection('users')
-    docs = users_ref.stream()
-    for doc in docs:
-        print(f'{doc.id} => {doc.to_dict()}')
-    return render(request, 'index.html')
+    if db.collection(u'MilkSocieties').document(request.session['user']).get().exists:
+        return render(request, 'index.html')
+    else:
+        return redirect('otherdetails')
 
 def register(request):
-    if request.method == "POST":
-        form: RegisterForm = RegisterForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            try:
-                user = auth.create_user(email = data['email'],password = data['password'],email_verified = False)
-                request.session['user'] = user.uid
-                request.session['lastvisit'] = str(datetime.datetime.now())
-                return redirect('otherdetails')
-            except:
-                messages.info(request,"User with email already exists")
-                return render(request, 'login.html',context = {"form":RegisterForm()})
-        else:
-            return render(request, 'registration.html',context = {"form":form})
-    else:
-        form = RegisterForm()
+    form = RegisterForm()
     return render(request, 'registration.html',context = {"form":form})
 
+def postregister(request):
+    if request.method == "POST":
+        import json
+        token = json.loads(request.body.decode('utf-8'))['tokenVal']
+        cookie = auth.create_session_cookie(token, expires_in=datetime.timedelta(days=5))
+        request.session['sessionCookie'] = cookie
+        response = HttpResponse()
+        response.status_code = 200
+        return response
+    response = HttpResponse()
+    response.status_code = 400
+    return response
+
+@login_required
+def postlogout(request):
+    if request.method == "POST":
+        import json
+        token = json.loads(request.body.decode('utf-8'))['tokenVal']
+        auth.revoke_refresh_tokens(token)
+        response = HttpResponse()
+        response.status_code = 200
+        response.delete_cookie('sessionCookie')
+        return response
+    response = HttpResponse()
+    response.status_code = 400
+    return response
 
 def login(request):
-    if request.method != "POST":
-        form = RegisterForm()
-        return render(request, 'login.html',context = {"form":form})
-    else:
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            try:
-                user = auth.get_user_by_email(data['email'])
-                try:
-                    if user.password != data['password']:
-                        raise Exception("Invalid Password")
-                    else:
-                        request.session['user'] = user.uid
-                        request.session['lastvisit'] = str(datetime.datetime.now())
-                        return render(request, 'index.html')
-                except:
-                    messages.error(request,'Invalid Password')
-                    return render(request, 'login.html',context = {"form":form})
-            except:
-                messages.error(request,'Invalid Email')
-                return render(request, 'login.html',context = {"form":form})
-        else:
-            return render(request, 'login.html',context = {"form":form})
+    form = RegisterForm()
+    return render(request, 'login.html',context = {"form":form})
+    
 
-
+@login_required
 def otherdetails(request):
-    if not precheck(request):
-        return render(request, 'registration.html',context = {"form":RegisterForm()})
-
     if request.method != "POST":
         form = MsRegistration()
         return render(request, 'otherdetails.html',context = {"form":form})

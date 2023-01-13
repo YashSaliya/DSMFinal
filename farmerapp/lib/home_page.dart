@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:csc_picker/csc_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -338,7 +340,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: MaterialButton(
                       minWidth: double.infinity,
                       height: 60,
-                      onPressed: () {},
+                      onPressed: () {
+                        // create a map of above inputs
+
+                        //create a firestore instance
+                        FirebaseFirestore firestore =
+                            FirebaseFirestore.instance;
+                        SharedPreferences.getInstance().then((p) {
+                          String userid = p.get('userId').toString();
+                          firestore
+                              .collection('farmers')
+                              .doc(userid)
+                              .set({"address": address});
+                        });
+                      },
                       color: Colors.redAccent,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40)),
