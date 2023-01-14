@@ -7,6 +7,8 @@
 {% block content %}
 
 <script type ="module">
+  //document.getElementById('alert_div').setAttribute("hidden","hidden")
+
   import {app} from "{% static 'material_2_pro_assets/js/firebase.js' %}"
   import { getAuth,signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
@@ -43,38 +45,72 @@
     console.log(email);
     console.log(password);
     let csrftoken = getCookie('csrftoken');
-    // firebase auth registernewuser
-    signInWithEmailAndPassword(auth,email, password).then((userCredentials)=>{
-      const user = userCredentials.user;
-      user.getIdToken().then((tokenVal)=>{
-        fetch("{% url 'newuser' %}",{
-          method : "POST",
-          body : JSON.stringify({"tokenVal":tokenVal}),
-          headers:{"X-CSRFToken": csrftoken}
-        }).then(
-          (response)=>{
-            console.log(response);
-            if(response.status == 200){
-              console.log("User Created");
-              window.location.replace("{% url 'index' %}")
-            }
-          }
-        )        
-      })
-    });
     
-  }
-  );
+    //firebase auth registernewuser
+    
+      signInWithEmailAndPassword(auth,email, password).then((userCredentials)=>{
+        const user = userCredentials.user;
+        user.getIdToken().then((tokenVal)=>{
+          fetch("{% url 'newuser' %}",{
+            method : "POST",
+            body : JSON.stringify({"tokenVal":tokenVal}),
+            headers:{"X-CSRFToken": csrftoken}
+          }).then(
+            (response)=>{
+              console.log(response);
+              if(response.status == 200){
+                console.log("User Created");
+                window.location.replace("{% url 'index' %}")
+              }
+              
+
+
+            }
+          )        
+        })
+      })
+      .catch(function(error) {
+        console.log("invalid")
+
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            if (errorCode === 'auth/wrong-password') {
+              document.getElementById('err_msg').innerHTML='Wrong password'
+
+            } else if(errorCode=='auth/user-not-found') {
+              document.getElementById('err_msg').innerHTML='Invalid username'
+              
+            }
+            document.getElementById('alert_div').removeAttribute("hidden")
+
+            console.log(error);
+        });
+
+    
+    
+    
+    
+      
+        
+});
+
 
 
 </script>
 
+<div class="alert alert-danger alert-dismissible text-white fade show" role="alert" id="alert_div" hidden >
+
+  <span class="alert-text" id="err_msg"><strong></strong></span>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+  </button>
+</div>
 <form name = "Login" class = "card-body bg-white border-circular" action = "#"> 
  
   <div class = "form-group row">
     <div class="input-group input-group-static mb-4">
     <label class = "input-group input-group-static mb-4"> Enter Email</label>
-    <input type = "email" class = "form-control" id = "id_email" value = "yashsaliya222002@gmail.com" name = "email" placeholder = "Enter Email" required>
+    <input type = "email" class = "form-control" id = "id_email" value = "emailyogi01@gmail.com" name = "email" placeholder = "Enter Email" required>
     </div>
     <span class = "h6" style = "color:red;"> </span>
 
@@ -82,17 +118,18 @@
   <div class = "form-group row">
     <div class="input-group input-group-static mb-4">
     <label class = "input-group input-group-static mb-4"> Enter Password</label>
-    <input type = "password" class = "form-control" id = "id_password" value = "yashsaliya" name = "password" placeholder = "Enter Password" required>
+    <input type = "password" class = "form-control" id = "id_password" value = "123456" name = "password" placeholder = "Enter Password" required>
     </div>
     <span class = "h6" style = "color:red;"></span>
     
   </div>
+  <div style = "text-align: center;">
+    <button id = "login" class = "btn btn-primary" >Login</button>
+  </div>
 <br>
 
 </form>
-<div style = "text-align: center;" class = "bg-white">
-  <button id = "login" onclick = "f()" class = "btn btn-primary" >Login</button>
-</div>
+
 <div class="ima">
     <a href = "{% url 'register' %}" > New Here ? Click here to register </a>
 </div>
