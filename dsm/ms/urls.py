@@ -6,6 +6,7 @@ urlpatterns = [
     path('otherdetails',otherdetails,name = 'otherdetails'),
     path('login',login,name = 'login'),
     path('newuser',postregister,name = 'newuser'),
-    path('logout',postlogout,name = 'logout')
+    path('logout',postlogout,name = 'logout'),
+    path('profileupdate',profile,name= 'profile')
     # path('addemailpass',asyncRequest,name = 'sendVerificationLink'),
 ]

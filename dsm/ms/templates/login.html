@@ -2,12 +2,11 @@
 
 {% extends 'base/loginbase.html' %}
 {% load static %}
-{% block title %} Register {% endblock %} 
+{% block title %} Login {% endblock %} 
 
 {% block content %}
 
 <script type ="module">
-  //document.getElementById('alert_div').setAttribute("hidden","hidden")
 
   import {app} from "{% static 'material_2_pro_assets/js/firebase.js' %}"
   import { getAuth,signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
@@ -105,30 +104,30 @@
       <span aria-hidden="true">&times;</span>
   </button>
 </div>
-<form name = "Login" class = "card-body bg-white border-circular" action = "#"> 
+<div class = "container">
+<div  class = "container bg-white card-body rounded shadow-blur" style = "margin: 25px auto;" > 
  
   <div class = "form-group row">
     <div class="input-group input-group-static mb-4">
-    <label class = "input-group input-group-static mb-4"> Enter Email</label>
-    <input type = "email" class = "form-control" id = "id_email" value = "emailyogi01@gmail.com" name = "email" placeholder = "Enter Email" required>
+      <label class = "input-group input-group-static mb-4"> Enter Email</label>
+      <input type = "email" class = "form-control" id = "id_email" value = "emailyogi01@gmail.com" name = "email" placeholder = "Enter Email" required>
     </div>
     <span class = "h6" style = "color:red;"> </span>
-
   </div>
   <div class = "form-group row">
     <div class="input-group input-group-static mb-4">
-    <label class = "input-group input-group-static mb-4"> Enter Password</label>
-    <input type = "password" class = "form-control" id = "id_password" value = "123456" name = "password" placeholder = "Enter Password" required>
+      <label class = "input-group input-group-static mb-4"> Enter Password</label>
+      <input type = "password" class = "form-control" id = "id_password" value = "123456" name = "password" placeholder = "Enter Password" required>
     </div>
     <span class = "h6" style = "color:red;"></span>
-    
   </div>
+  <br>
   <div style = "text-align: center;">
     <button id = "login" class = "btn btn-primary" >Login</button>
   </div>
-<br>
 
-</form>
+</div>
+</div>
 
 <div class="ima">
     <a href = "{% url 'register' %}" > New Here ? Click here to register </a>
