@@ -61,7 +61,12 @@
     }).catch(
       (error)=>{
         if(error.code == "auth/email-already-in-use"){
-          window.location.replace('{% url "login" %}')
+          $("#alert_div").attr("hidden",false);
+          $("#err_msg").text("Email already in use");
+        }
+        else if(error.code == "auth/invalid-email"){
+          $("#alert_div").attr("hidden",false);
+          $("#err_msg").text("Invalid Email");
         }
       }
     );
@@ -71,30 +76,34 @@
 
 
 </script>
+<div class="alert alert-danger alert-dismissible text-white fade show" role="alert" id="alert_div" hidden >
 
-<form name = "Register" class = "card-body bg-white border-circular" action = "#"> 
+  <span class="alert-text" id="err_msg"><strong></strong></span>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div  class = "container card-body rounded bg-white" style = "margin: 25px auto;" > 
  
   <div class = "form-group row">
     <div class="input-group input-group-static mb-4">
-    <label class = "input-group input-group-static mb-4"> Enter Email</label>
-    <input type = "email" class = "form-control" id = "id_email" value = "yashsaliya222002@gmail.com" name = "email" placeholder = "Enter Email" required>
+      <label class = "input-group input-group-static mb-4"> Enter Email</label>
+      <input type = "email" class = "form-control" id = "id_email" value = "emailyogi01@gmail.com" name = "email" placeholder = "Enter Email" required>
     </div>
     <span class = "h6" style = "color:red;"> </span>
-
   </div>
   <div class = "form-group row">
     <div class="input-group input-group-static mb-4">
-    <label class = "input-group input-group-static mb-4"> Enter Password</label>
-    <input type = "password" class = "form-control" id = "id_password" value = "yashsaliya" name = "password" placeholder = "Enter Password" required>
+      <label class = "input-group input-group-static mb-4"> Enter Password</label>
+      <input type = "password" class = "form-control" id = "id_password" value = "123456" name = "password" placeholder = "Enter Password" required>
     </div>
     <span class = "h6" style = "color:red;"></span>
-    
   </div>
-<br>
+  <br>
+  <div style = "text-align: center;">
+    <button id = "register" class = "btn btn-primary" >Register</button>
+  </div>
 
-</form>
-<div style = "text-align: center;" class = "bg-white">
-  <button id = "register" onclick = "f()" class = "btn btn-primary" >Register</button>
 </div>
 <div class="ima">
     <a href = "{% url 'login' %}" > Already Registered ? Click here For Login </a>

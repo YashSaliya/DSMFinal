@@ -93,3 +93,24 @@ def otherdetails(request):
             return render(request, 'index.html')
         else:
             return render(request, 'otherdetails.html',context = {"form":form})
+
+@login_required
+def profile(request):
+    if request.method != "POST":
+        #populate form with firestore stored data 
+        doc_ref = db.collection(u'MilkSocieties').document(request.session['user'])
+        doc = doc_ref.get()
+        data = doc.to_dict()
+        form = MsRegistration(initial=data)
+        return render(request, 'editprofile.html',context = {"form":form})
+    else:
+        form = MsRegistration(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            doc_ref = db.collection(u'MilkSocieties').document(request.session['user'])
+            doc_ref.update(data)
+            messages.info(request,"Profile Updated")
+            return redirect('profile')
+        else:
+            messages.warning(request,form.errors)
+            return render(request, 'editprofile.html',context = {"form":form})
