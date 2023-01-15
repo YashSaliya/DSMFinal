@@ -32,6 +32,16 @@
     }
 
 </style>
+<script>
+function get_lat_lng(address) {
+    fetch(`https://nominatim.openstreetmap.org/search?q=${address.value}&format=json`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("id_latitude").value = data[0].lat;
+            document.getElementById("id_longitude").value = data[0].lon;
+        });
+}
 
+</script>
 {% endblock %}
 

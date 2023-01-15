@@ -86,6 +86,7 @@ def otherdetails(request):
         form = MsRegistration(request.POST)
         if form.is_valid():
             data = form.cleaned_data
+            print(data)
             print("hello" + str(request.session['user']))
             doc_ref = db.collection(u'MilkSocieties').document(request.session['user'])
             doc_ref.set(data)

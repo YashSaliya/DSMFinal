@@ -105,7 +105,7 @@
       <span aria-hidden="true">&times;</span>
   </button>
 </div>
-<form name = "Login" class = "card-body bg-white border-circular" action = "#"> 
+<div name = "Login" class = "card-body bg-white border-circular " action = "#"> 
  
   <div class = "form-group row">
     <div class="input-group input-group-static mb-4">
@@ -121,14 +121,15 @@
     <input type = "password" class = "form-control" id = "id_password" value = "123456" name = "password" placeholder = "Enter Password" required>
     </div>
     <span class = "h6" style = "color:red;"></span>
-    
+
+    <div style = "text-align: center;">
+  <button id = "login" class = "btn btn-primary" >Login</button>
+</div>
   </div>
-  <div style = "text-align: center;">
-    <button id = "login" class = "btn btn-primary" >Login</button>
-  </div>
+  
 <br>
 
-</form>
+</div>
 
 <div class="ima">
     <a href = "{% url 'register' %}" > New Here ? Click here to register </a>
