@@ -2,6 +2,7 @@
 from django import forms
 import firebase_admin
 from firebase_admin import firestore
+import requests
 indianStates = [
 ('Andhra Pradesh', 'Andhra Pradesh'),
 ('Arunachal Pradesh', 'Arunachal Pradesh'),
@@ -65,29 +66,33 @@ class MsRegistration(forms.Form):
     storage_capacity = forms.FloatField()
     minFatCow = forms.FloatField()
     minFatBuffalo = forms.FloatField()
-    latitude = forms.DecimalField(widget=forms.HiddenInput())
-    longitude = forms.DecimalField(widget=forms.HiddenInput())
+    latitude = forms.FloatField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    longitude = forms.FloatField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
 
     def __init__(self:forms.Form,*args,**kwargs):
         super(MsRegistration,self).__init__(*args,**kwargs)
-        self.fields['city'].widget.attrs.update({'onchange': 'get_lat_lng(this)'})
+        # self.fields['address'].widget.attrs.update({'onchange': 'get_lat_lng(this)'})
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
-    def clean(self):
-        cleaned_data = super().clean()
-        address = cleaned_data.get("city")
-        if address:
-            # call geocoding API to get lat, lng
-            lat, lng = get_lat_lng(address)
-            cleaned_data['latitude'] = lat
-            cleaned_data['longitude'] = lng
-        return cleaned_data
+            
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     address = cleaned_data.get('address')
+    #     lat,lng=get_lat_lng(address)
+    #     cleaned_data['latitude'] = lat
+    #     cleaned_data['longitude'] = lng
+        
+    #     return cleaned_data
 
 from geopy.geocoders import Nominatim
 
 def get_lat_lng(address):
-    geolocator = Nominatim(user_agent="geoapiExercises")
-    location = geolocator.geocode(address)
-    return (location.latitude, location.longitude)
+    API_KEY = 'a5a7d8f4c6f24fcfb94f8168961e380f'
+    url = f'https://api.opencagedata.com/geocode/v1/json?q={address}&key={API_KEY}'
+    response = requests.get(url)
+    data = response.json()
+    lat = data['results'][0]['geometry']['lat']
+    lng = data['results'][0]['geometry']['lng']
+    return lat, lng
 
 
