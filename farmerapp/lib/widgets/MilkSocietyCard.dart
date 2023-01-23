@@ -1,0 +1,37 @@
+import 'package:flutter/material.dart';
+
+import '../home/models/Models.dart';
+import '../home/screens/MilkSocietyDetails.dart';
+
+
+class MilkSocietyCard extends StatelessWidget{
+  final MilkSociety ms;
+  const MilkSocietyCard({Key? key, required this.ms}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            leading: const Icon(Icons.account_balance),
+            title: Text(ms.name!),
+            subtitle: Text(ms.address!),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              TextButton(
+                child: const Text('View'),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MilkSocietyDetails(ms: ms)));
+                },
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

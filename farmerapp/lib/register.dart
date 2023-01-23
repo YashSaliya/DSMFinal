@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pinput/pinput.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'Homescreen.dart';
+import 'home/screens/Homescreen.dart';
 import 'home_page.dart';
 
 class Register extends StatelessWidget {

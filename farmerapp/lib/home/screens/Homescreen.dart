@@ -2,14 +2,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../widgets/Drawer.dart';
+
 class Homepage extends StatelessWidget {
-  const Homepage({Key? key}) : super(key: key);
+  final String? cityVal;
+  const Homepage({Key? key, required this.cityVal}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: AppDrawer(cityVal: cityVal),
       appBar: AppBar(
         title: const Text("Home"),
+      ),
+      body: const Center(
+        child: Text("Welcome to Milk Society App"),
       ),
     );
   }
