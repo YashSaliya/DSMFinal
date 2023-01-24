@@ -36,8 +36,10 @@
         </button>
     </div>
 <script>
-$('#id_latitude').hide();
-$('#id_longitude').hide();
+
+let t  = document.getElementsByClassName('form form-group');
+t[t.length-2].setAttribute('hidden','true');
+t[t.length-3].setAttribute('hidden','true');
 
 async function get_lat_lng() {
 

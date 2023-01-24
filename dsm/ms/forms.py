@@ -140,8 +140,8 @@ class MsRegistration(forms.Form):
     storage_capacity = forms.FloatField()
     minFatCow = forms.FloatField()
     minFatBuffalo = forms.FloatField()
-    latitude = forms.FloatField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
-    longitude = forms.FloatField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    latitude = forms.FloatField(widget=forms.HiddenInput())
+    longitude = forms.FloatField(widget=forms.HiddenInput())
 
     def __init__(self:forms.Form,*args,**kwargs):
         super(MsRegistration,self).__init__(*args,**kwargs)
