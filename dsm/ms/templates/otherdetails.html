@@ -41,7 +41,7 @@
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn bg-gradient-primary">Submit Form</button>
+                      <button type="submit" id="modal-submit" class="btn bg-gradient-primary">Submit Form</button>
                     </div>
                   </div>
                 </div>
@@ -108,11 +108,18 @@
 const registerBtn = document.querySelector('#register-btn');
 const form = document.querySelector('#my-form');
 const modal = new mdc.dialog.MDCDialog(document.querySelector('#modal'));
+const mb=document.querySelector('modal-submit')
 
 registerBtn.addEventListener('click', (event) => {
   event.preventDefault(); // prevent form from submitting
   modal.open();
 });
+
+mb.addEventListener('click',(event)=>{
+  event.preventDefault();
+  form.submit()
+  modal.close()
+})
 
 
 // async function get_lat_lng(address) {
