@@ -14,6 +14,7 @@ import django.contrib.auth.models as django
 from django.contrib import messages 
 from django.http import *
 from django.shortcuts import redirect
+from dsm.settings import apikey
 
 
 cred = firebase_admin.credentials.Certificate("certificate.json")
@@ -40,8 +41,7 @@ def login_required(function):
 @login_required
 def index(request):
     key=db.collection("Cluster_key").document(request.session['user']).get().get("key")
-    if db.collection(key).document("milkSociety").collection("district_ms").document(request.session['user']).get().exists:
-    
+    if key and  db.collection(key).document("milkSociety").collection("district_ms").document(request.session['user']).get().exists:
         return render(request, 'index.html')
     else:
          return redirect('otherdetails')
@@ -86,7 +86,7 @@ def login(request):
 def otherdetails(request):
     if request.method != "POST":
         form = MsRegistration()
-        return render(request, 'otherdetails.html',context = {"form":form,'apikey':json.dumps(config('apikey'))})
+        return render(request, 'otherdetails.html',context = {"form":form,'apikey':json.dumps(apikey)})
     else:
         form = MsRegistration(request.POST)
         if form.is_valid():
@@ -117,7 +117,7 @@ def profile(request):
         doc = doc_ref.get()
         data = doc.to_dict()
         form = MsRegistration(initial=data)
-        return render(request, 'editprofile.html',context = {"form":form,'apikey':json.dumps(config('apikey'))})
+        return render(request, 'editprofile.html',context = {"form":form,'apikey':json.dumps(apikey)})
     else:
         form = MsRegistration(request.POST)
         if form.is_valid():
