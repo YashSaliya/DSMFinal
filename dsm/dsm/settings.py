@@ -13,13 +13,21 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
-
+import environ
+env = environ.Env()
+environ.Env.read_env()                                                                   
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
+# apikey= env('api_key')
+from decouple import config
+
+# Example of how to use the variables
+apikey = config('api_key')
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-a!dt077g5y@r^t2yqyugfw8tvua+2n08i=w-%z43sjv^gyb7j!'
@@ -58,7 +66,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'dsm.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

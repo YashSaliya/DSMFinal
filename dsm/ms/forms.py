@@ -2,6 +2,7 @@
 from django import forms
 import firebase_admin
 from firebase_admin import firestore
+from firebase_admin.firestore import value
 import requests
 indianStates = [
 ('Andhra Pradesh', 'Andhra Pradesh'),
@@ -41,6 +42,77 @@ indianStates = [
 ('Jammu and Kashmir', 'Jammu and Kashmir'),
 ('Ladakh', 'Ladakh'),
 ]
+districts = [
+    ('Ahmednagar', 'Ahmednagar'),
+    ('Akola', 'Akola'),
+    ('Amravati', 'Amravati'),
+    ('Aurangabad', 'Aurangabad'),
+    ('Beed', 'Beed'),
+    ('Bhandara', 'Bhandara'),
+    ('Buldhana', 'Buldhana'),
+    ('Chandrapur', 'Chandrapur'),
+    ('Dhule', 'Dhule'),
+    ('Gadchiroli', 'Gadchiroli'),
+    ('Gondia', 'Gondia'),
+    ('Hingoli', 'Hingoli'),
+    ('Jalgaon', 'Jalgaon'),
+    ('Jalna', 'Jalna'),
+    ('Kolhapur', 'Kolhapur'),
+    ('Latur', 'Latur'),
+    ('Mumbai City', 'Mumbai City'),
+    ('Mumbai Suburban', 'Mumbai Suburban'),
+    ('Nagpur', 'Nagpur'),
+    ('Nanded', 'Nanded'),
+    ('Nandurbar', 'Nandurbar'),
+    ('Nashik', 'Nashik'),
+    ('Osmanabad', 'Osmanabad'),
+    ('Palghar', 'Palghar'),
+    ('Parbhani', 'Parbhani'),
+    ('Pune', 'Pune'),
+    ('Raigad', 'Raigad'),
+    ('Ratnagiri', 'Ratnagiri'),
+    ('Sangli', 'Sangli'),
+    ('Satara', 'Satara'),
+    ('Sindhudurg', 'Sindhudurg'),
+    ('Solapur', 'Solapur'),
+    ('Thane', 'Thane'),
+    ('Wardha', 'Wardha'),
+    ('Washim', 'Washim'),
+    ('Yavatmal', 'Yavatmal'),
+    ('Ahmedabad', 'Ahmedabad'),
+    ('Amreli', 'Amreli'),
+    ('Anand', 'Anand'),
+    ('Aravalli', 'Aravalli'),
+    ('Banaskantha', 'Banaskantha'),
+    ('Bharuch', 'Bharuch'),
+    ('Bhavnagar', 'Bhavnagar'),
+    ('Botad', 'Botad'),
+    ('Chhota Udaipur', 'Chhota Udaipur'),
+    ('Dahod', 'Dahod'),
+    ('Dang', 'Dang'),
+    ('Devbhoomi Dwarka', 'Devbhoomi Dwarka'),
+    ('Gandhinagar', 'Gandhinagar'),
+    ('Girsomnath', 'Girsomnath'),
+    ('Jamnagar', 'Jamnagar'),
+    ('Junagadh', 'Junagadh'),
+    ('Kutch', 'Kutch'),
+    ('Kheda', 'Kheda'),
+    ('Mahisagar', 'Mahisagar'),
+    ('Mehsana', 'Mehsana'),
+    ('Morbi', 'Morbi'),
+    ('Narmada', 'Narmada'),
+    ('Navsari', 'Navsari'),
+    ('Panchmahal', 'Panchmahal'),
+    ('Patan', 'Patan'),
+    ('Porbandar', 'Porbandar'),
+    ('Rajkot', 'Rajkot'),
+    ('Sabarkantha', 'Sabarkantha'),
+    ('Surat', 'Surat'),
+    ('Surendranagar', 'Surendranagar'),
+    ('Tapi', 'Tapi'),
+    ('Vadodara', 'Vadodara'),
+    ('Valsad', 'Valsad')
+]
 
 
 
@@ -59,9 +131,11 @@ class RegisterForm(forms.Form):
 
 
 class MsRegistration(forms.Form):
-    address  = forms.CharField(max_length = 200)
+    entity=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     state = forms.ChoiceField(choices = indianStates)
     city = forms.CharField(max_length = 100)
+    district = forms.ChoiceField(choices=districts)
+    address  = forms.CharField(max_length = 200)
     pincode = forms.IntegerField()
     storage_capacity = forms.FloatField()
     minFatCow = forms.FloatField()
@@ -71,7 +145,7 @@ class MsRegistration(forms.Form):
 
     def __init__(self:forms.Form,*args,**kwargs):
         super(MsRegistration,self).__init__(*args,**kwargs)
-        # self.fields['address'].widget.attrs.update({'onchange': 'get_lat_lng(this)'})
+        self.fields['entity'].initial="milkSociety"
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
             

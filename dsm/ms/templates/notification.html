@@ -1,0 +1,42 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Login {% endblock %} 
+
+{% block content %}
+<script type ="module">
+  //import {db} from "{% static 'material_2_pro_assets/js/firebase.js' %}"
+  //import {db} from "{% static 'material_2_pro_assets/js/firebase.js' %}"
+
+// import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+// import { getFirestore } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+// Follow this pattern to import other Firebase services
+// import { } from 'firebase/<service>';
+
+// TODO: Replace the following with your app's Firebase project configuration
+// const firebaseConfig = {
+//     apiKey: "AIzaSyCWzp6-kj52hdmmhDfR810nJLLfJkrxS5I",
+//     authDomain: "ng-test-fb229.firebaseapp.com",
+//     databaseURL: "https://ng-test-fb229-default-rtdb.firebaseio.com",
+//     projectId: "ng-test-fb229",
+//     storageBucket: "ng-test-fb229.appspot.com",
+//     messagingSenderId: "841168642654",
+//     appId: "1:841168642654:web:c9a1ad16dddda7bfa88acf"
+//   };
+
+//const app = initializeApp(firebaseConfig);
+//const db = getFirestore(app);
+console.log(db);
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  {{apikey}}
+</body>
+</html>
+
+{% endblock %}

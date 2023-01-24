@@ -13,7 +13,7 @@
    <div class = "container">
     
         <h1 class = "mt-3 mb-4 display-3 text-center">Register</h1>
-        <form class = "form-container bg-white rounded shadow-blur p-3" name = "MsRegistration" action ="{% url 'otherdetails' %}" method = "POST">
+        <form id="my-form" class = "form-container bg-white rounded shadow-blur p-3" name = "MsRegistration" action ="{% url 'otherdetails' %}" method = "POST">
             {% csrf_token %}
              {% for field in form %}
               <div class = "form-group row">
@@ -25,11 +25,32 @@
             <div style = "text-align: center;">
                 
                 <button type="button" class = "btn btn-primary" onclick="get_lat_lng()" >GetLatLng</button>
-                <button type = "submit" class = "btn btn-primary" >Register</button>
+                <button id="register-btn" data-bs-toggle="modal" data-bs-target="#exampleModal" class = "btn btn-primary" >Register</button>
             </div>
-            
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title font-weight-normal" id="exampleModalLabel">Check District</h5>
+                      <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <h6>Please Check your District input.As it will be used to create cluster.</h6>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" class="btn bg-gradient-primary">Submit Form</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
         </form>
+            
     </div>
+    <!-- Modal -->
+    
 {% endblock %}
 
 {% block other_css %}
@@ -43,24 +64,38 @@
 
 </style>
 <script>
-    function get_lat_lng() {
+    async function get_lat_lng() {
 
     add=document.getElementById("id_address").value
     city=document.getElementById("id_city").value
     if(add !="" && city !=""){
         address=add+" "+city
-        console.log((address));
+        var apikey=JSON.parse('{{ apikey|escapejs }}');
 
-        const API_KEY = 'a5a7d8f4c6f24fcfb94f8168961e380f';
-        const url = `https://api.opencagedata.com/geocode/v1/json?q=${address}&key=${API_KEY}`;
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${apikey}`;
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                document.getElementById("id_latitude").value = data.results[0].geometry.lat;
-                document.getElementById("id_longitude").value = data.results[0].geometry.lng;
-            });
+        try {
+            const response = await fetch(url);
+            const json = await response.json();
+            const lat = json.results[0].geometry.location.lat;
+            const lng = json.results[0].geometry.location.lng;
+            document.getElementById("id_latitude").value = lat;
+            document.getElementById("id_longitude").value = lng;
+            
+        }
+        catch (error) {
+            console.error(error);
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let lat = position.coords.latitude;
+                    let lng = position.coords.longitude;
+                    document.getElementById("id_latitude").value = lat;
+                    document.getElementById("id_longitude").value = lng;
+                });
+            }
+
+        }
+    
 
     }
     else{
@@ -70,6 +105,15 @@
     }
     
 }
+const registerBtn = document.querySelector('#register-btn');
+const form = document.querySelector('#my-form');
+const modal = new mdc.dialog.MDCDialog(document.querySelector('#modal'));
+
+registerBtn.addEventListener('click', (event) => {
+  event.preventDefault(); // prevent form from submitting
+  modal.open();
+});
+
 
 // async function get_lat_lng(address) {
 //     const url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?text=${address}&f=json";
