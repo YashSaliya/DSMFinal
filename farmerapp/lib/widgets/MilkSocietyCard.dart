@@ -1,7 +1,8 @@
+import 'package:farmerapp/home/screens/MilkSocietyEnroll.dart';
 import 'package:flutter/material.dart';
 
 import '../home/models/Models.dart';
-import '../home/screens/MilkSocietyDetails.dart';
+import 'MilkSocietyDetails.dart';
 
 
 class MilkSocietyCard extends StatelessWidget{
@@ -24,7 +25,7 @@ class MilkSocietyCard extends StatelessWidget{
               TextButton(
                 child: const Text('View'),
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MilkSocietyDetails(ms: ms)));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MilkSocietyEnroll(ms: ms)));
                 },
               ),
               const SizedBox(width: 8),

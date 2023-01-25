@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
     String? userId = prefs.getString('userId') == null ? "": prefs.getString('userId');
     user = userId.toString();
     String key = await checkUserDetails();
+    key != '' ? prefs.setString("key", key): null;
     res['user'] = userId.toString();
     res['key'] = key;
     return res;

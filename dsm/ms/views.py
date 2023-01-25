@@ -144,10 +144,10 @@ def profile(request):
         else:
             messages.warning(request,form.errors)
             return render(request, 'editprofile.html',context = {"form":form,'apikey':json.dumps(config('apikey'))})
+
 @login_required
 def notification(request):
-
-    return render(request,"notification.html",{'apikey':config('apikey')})
+    return render(request,"notification.html")
     
 # void sendInfoToMilkSociety(String milkSocietyId, String farmerName) async {
 #   final milkSocietyRequestRef = Firestore.instance.collection("milk_society_requests").document(milkSocietyId);

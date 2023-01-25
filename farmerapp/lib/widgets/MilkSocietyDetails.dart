@@ -1,19 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/Models.dart';
+import '../home/models/Models.dart';
 
 
 class MilkSocietyDetails extends StatelessWidget{
   final MilkSociety ms;
-  const MilkSocietyDetails({Key? key, required this.ms}) : super(key: key);
+  const MilkSocietyDetails({Key? key,  required this.ms}) : super(key: key) ;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(ms.name!),
-      ),
-      body: Column(
+  Widget build(BuildContext context){
+    return Column(
         children: <Widget>[
           ListTile(
             leading: const Icon(Icons.account_balance),
@@ -25,16 +23,11 @@ class MilkSocietyDetails extends StatelessWidget{
             title: Text(ms.storageCapacity.toString()),
             subtitle: const Text("Storage Capacity"),
           ),
-          Center(
-            child: ElevatedButton(
-              child: const Text("Become A Member"),
-              onPressed: () {
 
-              },
-            ),
-          ),
         ],
-      ),
-    );
+      );
+    // return Container(
+    //   child: const Text("hello")
+    // );
   }
 }

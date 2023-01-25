@@ -1,4 +1,5 @@
 import 'package:farmerapp/home/screens/ListMilkSocietiesScreen.dart';
+import 'package:farmerapp/home/screens/ShowContracts.dart';
 import 'package:flutter/material.dart';
 
 class AppDrawer extends StatelessWidget{
@@ -26,11 +27,19 @@ class AppDrawer extends StatelessWidget{
           ListTile(
             title: const Text('Update Profile Details'),
             onTap: () {
-              if(ModalRoute.of(context)!.settings.name != '/updateProfile'){
-                Navigator.pushNamed(context, '/updateProfile');
-              }
             },
           ),
+          ListTile(
+            title: const Text('Logout'),
+            onTap:(){}
+          ),
+          ListTile(
+            title: const Text('Contracts'),
+            onTap: (){
+              Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new ShowContracts(cityVal: cityVal)));
+            },
+          )
+
         ],
       ),
     );
