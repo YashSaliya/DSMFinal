@@ -1,106 +1,259 @@
 {% extends 'base/base.html' %}
 {% load static %}
-{% block title %} Login {% endblock %} 
+{% block title %} Notification {% endblock %} 
 
 {% block content %}
 
-<!-- import {app,db} from "{% static 'material_2_pro_assets/js/firebase.js' %}" -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
+    
     <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
 </head>
 <body>
   <div id="container"></div>
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title font-weight-normal" id="exampleModalLabel">Contract Details</h5>
+          <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container-md rounded">
+            <div class = "card">
+                <!-- <div class = "card-title"> <h2 class=" mt-3 mb-4 display-4 text-center"></h2>   </div> -->
+                <div class = "card-body"> 
+                    <form id="my-form" class = "form-container" method = "POST" action = "{% url 'notification' %}">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class = "form form-group">
+                                <div class="input-group input-group-static mt-2">
+                                    <label class = "input-group input-group-static">{{ field.label_tag }}</label>
+                                    {{ field }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        <div class="modal-footer">
+                          <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn bg-gradient-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  
-  
+
 </body>
 </html>
+  
 
-<script>
+<script >
+  let t  = document.getElementsByClassName('form form-group');
+  t[t.length-1].setAttribute('hidden','true')
+  var key;
   const firebaseConfig = {
     apiKey: "AIzaSyCWzp6-kj52hdmmhDfR810nJLLfJkrxS5I",
-      authDomain: "ng-test-fb229.firebaseapp.com",
-      databaseURL: "https://ng-test-fb229-default-rtdb.firebaseio.com",
-      projectId: "ng-test-fb229",
-      storageBucket: "ng-test-fb229.appspot.com",
-      messagingSenderId: "841168642654",
-      appId: "1:841168642654:web:c9a1ad16dddda7bfa88acf"
+    authDomain: "ng-test-fb229.firebaseapp.com",
+    databaseURL: "https://ng-test-fb229-default-rtdb.firebaseio.com",
+    projectId: "ng-test-fb229",
+    storageBucket: "ng-test-fb229.appspot.com",
+    messagingSenderId: "841168642654",
+    appId: "1:841168642654:web:c9a1ad16dddda7bfa88acf"
     };
     firebase.initializeApp(firebaseConfig);
     const db=firebase.firestore()
-    
-    // db.collection('Cluster_key').onSnapshot(snapshot=>{
-    //   let changes=snapshot.docChanges()
-    //   changes.forEach(change=>{
-    //     console.log(change.doc.data());
-    //   })
-      
-    // })
-    var firestore = firebase.firestore();
+    var msid=JSON.parse('{{ msid|escapejs }}');
+  //   const auth=firebase.auth()
+  //   console.log(auth);
 
-var district = firestore.collection("Thane");
+  //   firebase.auth().getUser(msid)
+  // .then(function(userRecord) {
+  //   console.log("Successfully fetched user data:", userRecord.email);
+  // })
+  // .catch(function(error) {
+  //   console.log("Error fetching user data:", error);
+  // });
+var data=JSON.parse('{{ data|escapejs }}');
 
-var milkSocietyRef = district.doc("milkSociety");
+  cluster=db.collection('Cluster_key')
 
-var districtMsRef = milkSocietyRef.collection("district_ms");
 
-var msdoc = districtMsRef.doc("5shXr5O94LPZgy32R1FH9Y6iJuh1");
-var req=msdoc.collection('Request')
-req.onSnapshot(function(snapshot) {
-  // console.log(snapshot.docChanges());
-  snapshot.docChanges().forEach(function(change) {
-    if (change.type === "added") {
-      create_card(change.doc.id)
-    }
-    if (change.type === "modified") {
-      console.log("Modified doc: ", change.doc.data());
-    }
-    if (change.type === "removed") {
-      card=document.querySelector('#'+change.doc.id)
-      document.querySelector('#container').removeChild(card)
-    }
+async function get_key(cluster,id){
+  
+  let key;
+  await cluster.doc(id).get().then(x=>{
+    key = x.data().key;
   });
-});
-function create_card(id){
-  var card = document.createElement("div");
-  card.className = "card card-frame";
-  card.id=id
+  return key;
+}
 
-  // Create a card body element
+async function someFunc() {
+  const key = await get_key(cluster,msid);
+  var district = db.collection(key);
+
+  var milkSocietyRef = district.doc("milkSociety");
+
+  var districtMsRef = milkSocietyRef.collection("district_ms");
+  var districtFarmerRef = milkSocietyRef.collection("district_farmer");
+
+  var msdoc = districtMsRef.doc(msid);
+
+  var req=msdoc.collection('Request')
+  req.onSnapshot(function(snapshot) {
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === "added") {
+        var fid=change.doc.id
+        var fdoc=districtFarmerRef.doc(fid)
+        var name;
+        fdoc.get().then(x=>{
+          name=x.data().full_name
+          qty=x.data().dairy_milk_output
+          address=x.data().address
+          milk_type=change.doc.data().animal
+          shift=change.doc.data().shift 
+          rt=change.doc.data().requestTime.toDate()
+          let fd = rt.toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
+          console.log(name,qty,milk_type,shift,fd);
+          create_card(fid,name,qty,milk_type,shift,fd,address)
+
+
+        })
+
+
+
+      }
+      if (change.type === "modified") {
+        console.log("Modified doc: ", change.doc.data());
+      }
+      if (change.type === "removed") {
+        card=document.querySelector('#'+change.doc.id)
+        document.querySelector('#container').removeChild(card)
+      }
+    });
+  });
+  
+}
+someFunc()
+
+function create_card(fid,name,qty,milk_type,shift,fd,address) {
+
+  // Create card element
+  var card = document.createElement("div");
+  card.className = "card w-80";
+  card.id=fid
+  
+  // Create card header
+  var cardHeader = document.createElement("h5");
+  cardHeader.className = "card-header";
+  cardHeader.innerHTML = "Farmer "+name;
+  cardHeader.style.backgroundColor = "rgb(209, 219, 219)";
+  
+  // Create card body
   var cardBody = document.createElement("div");
   cardBody.className = "card-body";
+  
+  // Create card title
+  var cardTitle = document.createElement("h6");
+  cardTitle.className = "card-title";
+  cardTitle.innerHTML = "Contract Details";
+  
+  cardBody.appendChild(cardTitle);
+  // Create card text
+  var cardText = document.createElement("p");
+  cardText.className = "card-text";
+  cardText.innerHTML = "Mlk Type: "+milk_type
+  cardBody.appendChild(cardText);
 
-  // Add text to the card body
-  cardBody.innerHTML = id;
 
-  // Append the card body to the card
-  card.appendChild(cardBody);
+  var cardText = document.createElement("p");
+  cardText.className = "card-text";
+  cardText.innerHTML = "Shift: "+shift
+  cardBody.appendChild(cardText);
 
-  // Append the card to the desired container
-  document.getElementById("container").appendChild(card);
 
-}
-// req.onSnapshot(function(doc) {
-//     if (doc.exists) {
-//         var request = doc(id);
-//         request.forEach(function(req) {
-//             // Create a new card element
+  var cardText = document.createElement("p");
+  cardText.className = "card-text";
+  cardText.innerHTML = "Quantity(in Ltr): "+qty
+  cardBody.appendChild(cardText);
+
+  var cardText = document.createElement("p");
+  cardText.className = "card-text";
+  cardText.innerHTML = "Date: "+fd
+  cardBody.appendChild(cardText);
+  // Create button
+  var button = document.createElement("a");
+  
+  // button.href = "#";
+  button.className = "btn btn-primary";
+  button.innerHTML = "Make Contract";
+  button.style.position='absolute'
+  button.style.bottom='10px'
+  button.style.right='10px'
+  
+  button.onclick=function (){
+    $('#exampleModal').modal('show')
+    document.querySelector('#id_milk_society').value=data['name']
+    document.querySelector('#id_milk_society_address').value=data['address']
+    document.querySelector('#id_farmer').value=name
+    document.querySelector('#id_farmer_address').value=address
+    document.querySelector('#id_milk_type').value=milk_type
+    document.querySelector('#id_milk_qty').value=qty
+    document.querySelector('#id_fid').value=fid
+
+    if(milk_type=='Cow'){
+      document.querySelector('#id_min_fat_cow').value=data['minFatCow']
             
-//         });
-//     } else {
-//         console.log("No such document!");
-//     }
-// }, function(error) {
-//     console.log("Error getting document: ", error);
-// });
+    }
+    else{
+      document.querySelector('#id_min_fat_buffalo').value=data['minFatBuffalo']
+      
+    }
+    document.querySelector('#id_shift').value=shift
+
+  }
+
+  // Append elements to card body
+  cardBody.appendChild(button);
+  
+  // Append header and body to card
+  card.appendChild(cardHeader);
+  card.appendChild(cardBody);
+  
+  // Add card to document
+  var br = document.createElement("br");
+
+  document.getElementById("container").appendChild(card);
+  document.getElementById("container").appendChild(br);
+}
+
+function myfun(){
+  
+  var startdate = document.getElementById("id_start_date").value;
+  var duration = document.getElementById("id_duration").value;
+  var enddate = new Date(startdate);
+  enddate.setMonth(enddate.getMonth() + duration);
+  let timestamp = new Date(enddate);
+  let date = timestamp.toLocaleDateString();
+  document.getElementById("id_end_date").value = date;
+}
 
 
 </script>
+
+  
 
 {% endblock %}

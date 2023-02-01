@@ -1,4 +1,5 @@
 
+from datetime import datetime, timedelta
 from django import forms
 import firebase_admin
 from firebase_admin import firestore
@@ -127,7 +128,34 @@ class RegisterForm(forms.Form):
             self.fields[field].widget.attrs.update({'class':'form-control'})
 
 
+class contract_details(forms.Form):
+ 
+    milk_society=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    milk_society_address=forms.CharField()
+    farmer=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    farmer_address=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    milk_type=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    milk_qty=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    min_fat_cow=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    min_fat_buffalo=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    shift=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    start_date = forms.DateField()
+    duration=forms.IntegerField(widget=forms.TextInput(attrs={'placeholder':'Enter contract duration in months','oninput':'myfun()'}))
+    end_date=forms.DateField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    fid=forms.CharField(widget=forms.HiddenInput())
 
+
+    
+
+
+
+    def __init__(self:forms.Form,*args,**kwargs):
+        super(contract_details,self).__init__(*args,**kwargs)
+        self.fields['min_fat_cow'].initial='NA'
+        self.fields['min_fat_buffalo'].initial='NA'
+        
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class':'form-control'})
 
 
 class MsRegistration(forms.Form):
@@ -157,16 +185,4 @@ class MsRegistration(forms.Form):
     #     cleaned_data['longitude'] = lng
         
     #     return cleaned_data
-
-from geopy.geocoders import Nominatim
-
-def get_lat_lng(address):
-    API_KEY = 'a5a7d8f4c6f24fcfb94f8168961e380f'
-    url = f'https://api.opencagedata.com/geocode/v1/json?q={address}&key={API_KEY}'
-    response = requests.get(url)
-    data = response.json()
-    lat = data['results'][0]['geometry']['lat']
-    lng = data['results'][0]['geometry']['lng']
-    return lat, lng
-
 
