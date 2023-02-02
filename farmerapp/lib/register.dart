@@ -1,11 +1,11 @@
 // import
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_local_variable
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pinput/pinput.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'home/screens/Homescreen.dart';
 import 'home_page.dart';
 
@@ -247,11 +247,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         FirebaseAuth.instance.verifyPhoneNumber(
                             phoneNumber: _mobileNumber,
                             verificationCompleted:
-                                (PhoneAuthCredential credential) async {
-                              FirebaseAuth.instance
-                                  .signInWithCredential(credential)
-                                  .then((UserCredential us) {});
-                            },
+                                (PhoneAuthCredential credential) {},
                             verificationFailed: (FirebaseAuthException e) {
                               if (e.code == 'invalid-phone-number') {
                                 print(
@@ -308,7 +304,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             ),
                                             TextButton(
                                               child: const Text('Submit'),
-                                              onPressed: () {
+                                              onPressed: () async {
                                                 PhoneAuthCredential credential =
                                                     PhoneAuthProvider
                                                         .credential(
@@ -318,21 +314,52 @@ class _RegisterPageState extends State<RegisterPage> {
                                                 FirebaseAuth.instance
                                                     .signInWithCredential(
                                                         credential)
-                                                    .then(
-                                                        (UserCredential value) {
+                                                    .then((UserCredential
+                                                        value) async {
                                                   SharedPreferences
                                                           .getInstance()
                                                       .then((pref) {
                                                     pref.setString(
-                                                        "userId", value.user!.uid.toString());
+                                                        "userId",
+                                                        value.user!.uid
+                                                            .toString());
                                                   });
                                                   print(value);
-                                                  Navigator.of(context).pop();
-                                                  Navigator.of(context).push(
-                                                      MaterialPageRoute(
-                                                          builder: (BuildContext
-                                                                  context) =>
-                                                              const MyHomePage()));
+                                                  DocumentSnapshot ds =
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                              'Cluster_key')
+                                                          .doc(value.user!.uid)
+                                                          .get();
+                                                  var flag = ds.exists;
+                                                  var key = ds.exists
+                                                      ? ds['key']
+                                                      : "";
+                                                  if (flag) {
+                                                    SharedPreferences
+                                                            .getInstance()
+                                                        .then((pref) {
+                                                      pref.setString(
+                                                          "key", key);
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      Navigator.of(context).push(
+                                                          MaterialPageRoute(
+                                                              builder: (BuildContext
+                                                                      context) =>
+                                                                  const Homepage(
+                                                                      cityVal:
+                                                                          "Thane")));
+                                                    });
+                                                  } else {
+                                                    Navigator.of(context).pop();
+                                                    Navigator.of(context).push(
+                                                        MaterialPageRoute(
+                                                            builder: (BuildContext
+                                                                    context) =>
+                                                                const MyHomePage()));
+                                                  }
                                                 });
                                               },
                                             )
@@ -340,6 +367,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     );
                                   });
                             },
+                            timeout: const Duration(seconds: 60),
                             codeAutoRetrievalTimeout: (verificationId) => {})
                       },
                     )
