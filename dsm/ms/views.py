@@ -1,9 +1,11 @@
 import datetime
+from datetime import timedelta
 from django.shortcuts import render
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import auth
 import json
+from firebase_admin import storage
 from requests import request
 from .forms import *
 from django.conf import settings
@@ -15,6 +17,8 @@ from django.contrib import messages
 from django.http import *
 from django.shortcuts import redirect
 from dsm.settings import apikey
+from django.shortcuts import render
+from firebase_admin import auth
 
 
 cred = firebase_admin.credentials.Certificate("certificate.json")
@@ -54,7 +58,7 @@ def postregister(request):
     if request.method == "POST":
         import json
         token = json.loads(request.body.decode('utf-8'))['tokenVal']
-        cookie = auth.create_session_cookie(token, expires_in=datetime.timedelta(days=5))
+        cookie = auth.create_session_cookie(token, expires_in=timedelta(days=5))
         request.session['sessionCookie'] = cookie
         response = HttpResponse()
         response.status_code = 200
@@ -147,11 +151,79 @@ def profile(request):
 
 @login_required
 def notification(request):
-    return render(request,"notification.html")
     
-# void sendInfoToMilkSociety(String milkSocietyId, String farmerName) async {
-#   final milkSocietyRequestRef = Firestore.instance.collection("milk_society_requests").document(milkSocietyId);
-#   await milkSocietyRequestRef.setData({
-#     "farmer_name": farmerName
-#   });
-# }
+    # return render(request,'contract.html',{'data':'data'})
+    key=db.collection("Cluster_key").document(request.session['user']).get().get("key")
+    doc_ref = db.collection(key).document("milkSociety").collection("district_ms").document(request.session['user'])
+    doc=doc_ref.get()
+    data=doc.to_dict()
+    form=contract_details()
+    # name=data['name']
+
+    user = auth.get_user(request.session['user'])
+    print('Successfully fetched user data: {0}'.format(user.email))
+    if request.method!='POST':
+        
+        return render(request,"notification.html",{'msid':json.dumps(request.session['user']),
+        'data':json.dumps(data),'form':form})
+    else:
+        form = contract_details(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            print(data)
+            fuser=auth.get_user(data['fid'])
+            print(fuser.phone_number)
+            d={
+                'f_name':data['farmer'],
+                'ms_name':data['milk_society'],
+                'f_add':data['farmer_address'],
+                'ms_add':data['milk_society_address'],
+                'ms_email':user.email,
+                'type':data['milk_type'],
+                'qty':data['milk_qty'],
+                'shift':data['shift'],
+                'start_date':data['start_date'],
+                'end_date':data['end_date'],
+                'd':data['duration'],
+                'minfat':data['min_fat_cow'],
+                'path':json.dumps('mypath'),
+                'phn':fuser.phone_number
+                      
+
+            }
+            bucket=storage.bucket('ng-test-fb229.appspot.com')
+            html = render(request, 'contract.html', d).content
+            
+            blob = bucket.blob("ms_f/"+request.session['user']+"/"+data['fid']+"/contract.html")
+            blob.upload_from_string(html, 'text/html')
+           
+            url = blob.generate_signed_url(
+                expiration=timedelta(weeks=1),
+                method='GET'
+            )
+
+            # Use the URL to access the file
+            print(f'URL: {url}')
+            key=db.collection("Cluster_key").document(data['fid']).get().get("key")
+            farmer_doc = db.collection(key).document("milkSociety").collection("district_farmer").document(data['fid'])
+            req_collection=farmer_doc.collection('Request').document(request.session['user'])
+            req_collection.set({
+                'msid':request.session['user'],
+                'url':url
+            })
+
+
+
+
+           
+            
+            return render(request,'contract.html',d)
+        else:
+            messages.warning(request,form.errors)
+            return render(request,"notification.html",{'msid':json.dumps(request.session['user']),
+            'data':json.dumps(data),'form':form})
+
+
+        
+        
+
