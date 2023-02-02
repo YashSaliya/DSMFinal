@@ -163,8 +163,6 @@ def notification(request):
     user = auth.get_user(request.session['user'])
     print('Successfully fetched user data: {0}'.format(user.email))
     if request.method!='POST':
-            
-
         
         return render(request,"notification.html",{'msid':json.dumps(request.session['user']),
         'data':json.dumps(data),'form':form})
@@ -195,16 +193,28 @@ def notification(request):
             }
             bucket=storage.bucket('ng-test-fb229.appspot.com')
             html = render(request, 'contract.html', d).content
-            blob = bucket.blob('contract.html')
+            
+            blob = bucket.blob("ms_f/"+request.session['user']+"/"+data['fid']+"/contract.html")
             blob.upload_from_string(html, 'text/html')
            
             url = blob.generate_signed_url(
-                expiration=timedelta(minutes=15),
+                expiration=timedelta(weeks=1),
                 method='GET'
             )
 
             # Use the URL to access the file
             print(f'URL: {url}')
+            key=db.collection("Cluster_key").document(data['fid']).get().get("key")
+            farmer_doc = db.collection(key).document("milkSociety").collection("district_farmer").document(data['fid'])
+            req_collection=farmer_doc.collection('Request').document(request.session['user'])
+            req_collection.set({
+                'msid':request.session['user'],
+                'url':url
+            })
+
+
+
+
            
             
             return render(request,'contract.html',d)
