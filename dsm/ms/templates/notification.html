@@ -45,7 +45,7 @@
                         
                         <div class="modal-footer">
                           <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" class="btn bg-gradient-primary">Save changes</button>
+                          <button type="submit" class="btn bg-gradient-primary">Make Contract</button>
                         </div>
                     </form>
                 </div>
@@ -74,35 +74,28 @@
     messagingSenderId: "841168642654",
     appId: "1:841168642654:web:c9a1ad16dddda7bfa88acf"
     };
-    firebase.initializeApp(firebaseConfig);
+    app=firebase.initializeApp(firebaseConfig);
+    console.log(app);
     const db=firebase.firestore()
     var msid=JSON.parse('{{ msid|escapejs }}');
-  //   const auth=firebase.auth()
-  //   console.log(auth);
-
-  //   firebase.auth().getUser(msid)
-  // .then(function(userRecord) {
-  //   console.log("Successfully fetched user data:", userRecord.email);
-  // })
-  // .catch(function(error) {
-  //   console.log("Error fetching user data:", error);
-  // });
+    var key=JSON.parse('{{ key|escapejs }}');
+  
 var data=JSON.parse('{{ data|escapejs }}');
 
-  cluster=db.collection('Cluster_key')
+// cluster=db.collection('Cluster_key')
 
 
-async function get_key(cluster,id){
+// async function get_key(cluster,id){
   
-  let key;
-  await cluster.doc(id).get().then(x=>{
-    key = x.data().key;
-  });
-  return key;
-}
+//   let key;
+//   await cluster.doc(id).get().then(x=>{
+//     key = x.data().key;
+//   });
+//   return key;
+// }
 
 async function someFunc() {
-  const key = await get_key(cluster,msid);
+  // const key = await get_key(cluster,msid);
   var district = db.collection(key);
 
   var milkSocietyRef = district.doc("milkSociety");
@@ -175,7 +168,7 @@ function create_card(fid,name,qty,milk_type,shift,fd,address) {
   // Create card text
   var cardText = document.createElement("p");
   cardText.className = "card-text";
-  cardText.innerHTML = "Mlk Type: "+milk_type
+  cardText.innerHTML = "Milk Type: "+milk_type
   cardBody.appendChild(cardText);
 
 

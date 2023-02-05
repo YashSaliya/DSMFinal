@@ -1,0 +1,315 @@
+
+<style>
+  body{
+    margin: 40px;
+    width: 595px;
+    height: 842px;
+    font-family: Arial, Helvetica, sans-serif;
+
+  }
+  
+  #contract_pg_1 h1{
+    text-align: center;
+  }
+  .sign-box {
+  width: 80px;
+  height: 80px;
+  border: 2px solid black;
+  display: inline-block;
+}
+
+.sign-box.clicked::before {
+  content: "✔";
+  font-size: 50px;
+  color: green;
+  position: relative;
+
+  /* transform: translate(-50%, -50%); */
+}
+
+.sign-box1 {
+  width: 80px;
+  height: 80px;
+  border: 2px solid black;
+  display: inline-block;
+}
+
+.sign-box1::before {
+  content: "✔";
+  font-size: 50px;
+  color: green;
+  position: relative;
+
+  /* transform: translate(-50%, -50%); */
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 50% 50%;
+  }
+.item {
+    
+    /* padding: 20px; */
+    text-align: center;
+
+  }
+  .item-left{
+    text-align: left;
+  }
+  .item-right{
+    text-align: right;
+  }
+ 
+
+</style>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/vfs_fonts.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body id="body" >
+  <!-- Button trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Launch demo modal
+</button> -->
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Enter PIN</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="">Enter pin:</label>
+        <input type="number" id="mypin">
+        <p id="msg"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cls" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="chk_pin()">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please Wait</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="msg1">Processing...</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="chk_pin()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <div id="c" style="margin: 30px;font-family: Arial, Helvetica, sans-serif;" >
+    
+  <div id='contract_pg_1'>
+    <h1>Milk Supply Contract</h1>
+    <br>
+    <div class="container">
+      <div class="item-left">
+        <h5>Prepared for:</h5>
+        <p>{{f_name}}</p>
+        <p>Farmer</p>
+        <p>{{f_add}}</p>
+        <p>{{phn}}</p>
+      </div>
+      <div class="item-right">
+        <h5>Created by:</h5>
+        <p>{{ms_name}}</p>
+        <p>Milk Society</p>
+        <p>{{ms_add}}</p>
+        <p>{{ms_email}}</p>    
+    
+      </div>
+    
+    </div>
+    <p>
+      This Supply Agreement, herein referred to as “Agreement,” is made effective on {{start_date}} by and between "{{ms_name}}", herein frequently referred to as "Purchaser," and "{{f_name}}", herein frequently referred to as "Supplier".<br>
+      Supplier and Purchaser may be referred to as individually as "Party" or collectively as the "Parties."<br>
+      Whereas:<br>
+      A) The Supplier is engaged in the business of supplying certain goods as defined below;<br>
+      B) The Purchaser wishes to acquire certain goods from the Supplier as defined below;<br>
+      Now, therefore, the Parties agree as follows:<br>
+  
+    </p>
+        
+  </div>
+  <div id="contract_pg_2">
+    <h3>Scope</h3>
+    <p>
+      The purpose of this Agreement is to set out the provisions under which Supplier will deliver to Purchaser the "Products" as described in the following clause.
+      The purchases of all Products by Purchaser from Supplier shall be exclusively subject to the provisions of this Agreement.<br>
+      Both Parties acknowledge that this Agreement forms the basis of the contractual relationship between the Parties and waive application of their respective standard terms and conditions that typically apply to such transactions.
+    </p>
+    <h3>Product</h3>
+    <p>
+      The Supplier shall supply the following Product:
+      <h6>Milk type: {{type}}</h6>
+      <h6>Quantity(Ltr): {{qty}}</h6>
+      <h6>Delivery: Daily</h6>
+      <h6>Min fat% in milk: {{minfat}}</h6>
+      <h6>Shift(delivery time): {{shift}}</h6>
+    </p>
+    <h3>Supply of product</h3>
+    <p>
+      During the term of this Agreement and any extension thereof,
+      the Supplier shall sell and supply the products to the Purchaser, and the Purchaser shall buy the products from Supplier
+      exclusively/non-exclusively. The Purchaser shall have the right to inspect the Products upon delivery for any potential deficiencies or defects.
+    </p>
+    <h3>Pricing</h3>
+    <p>
+      Supplier shall be paid according to the fat content in his/her supplied milk.
+    </p>
+    
+  </div>
+  <div id="contract_pg_3">
+    <h3>Payment Terms</h3>
+    <p>Supplier shall be paid on the daily basis.</p>
+    <h3>Force majeure</h3>
+    <p id='pid'>Supplier shall not be held responsible for delays or damages caused by reason of force majeure such as due to flood, earthquake, war, or in cases of inclement weather that shall impact the delivery of the goods to the Purchaser in any way. Supplier shall notify the Purchaser as soon as possible regarding any such incident.</p>
+    <h3>Terms and Termination</h3>
+    <p>This Agreement shall begin on the date listed at the beginning of this document and shall remain in effect for the duration of {{d}} months until {{end_date}} unless this Agreement is terminated sooner as listed in this provision or elsewhere within this Agreement.<br>
+    A)The Party must supply only clean and fresh milk.<br>
+    B)Supplied milk should have the min fat%, if this condition is not meet then Purchaser has the right to reject the milk & supplier wont't be paid.<br>
+    C)Purchaser has the right to terminate the Contract if the quality of the milk is not according the the aggrement.</p>
+    <h5>Note: Green tick indicates contract is from valid party.</h5>
+
+</div>
+<div class="container">
+  <div class="item">
+    <span class="sign-box1">
+    </span>
+    <p>{{ms_name}}(Milk Society )</p>
+  </div>
+  <div class="item">
+    <span class="sign-box" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="myfun(this)"></span>
+    <p>{{f_name}}(Farmer)</p>
+  </div>
+</div>
+</div>
+</div>
+
+<button id="acpt-btn" class="btn btn-primary" style="margin-left: 250px" data-bs-toggle="modal" data-bs-target="#exampleModal1" onclick="convertAndUpload()" disabled="disabled">Accept Contract</button>
+</body>
+</html>
+<script>
+  var fid=JSON.parse('{{ fid|escapejs }}');
+  var msid=JSON.parse('{{ msid|escapejs }}');
+  var pin=JSON.parse('{{ pin|escapejs }}');
+  const firebaseConfig = {
+    apiKey: "AIzaSyCWzp6-kj52hdmmhDfR810nJLLfJkrxS5I",
+    authDomain: "ng-test-fb229.firebaseapp.com",
+    databaseURL: "https://ng-test-fb229-default-rtdb.firebaseio.com",
+    projectId: "ng-test-fb229",
+    storageBucket: "ng-test-fb229.appspot.com",
+    messagingSenderId: "841168642654",
+    appId: "1:841168642654:web:c9a1ad16dddda7bfa88acf"
+    };
+    app=firebase.initializeApp(firebaseConfig);
+
+let element=null
+function myfun(ele){
+  element=ele
+
+}
+
+
+const boxes = document.querySelectorAll('.box');
+
+boxes.forEach(box => {
+  box.addEventListener('click', () => {
+    const icon = box.querySelector('.icon');
+    icon.style.display = icon.style.display === 'block' ? 'none' : 'block';
+  });
+});
+function changeSign(element) {
+  element.classList.toggle("clicked");
+  
+  a=document.querySelector('#acpt-btn')
+  a.disabled = !a.disabled;  
+}
+function chk_pin(){
+  var x=document.querySelector('#mypin').value
+  if (x==pin){
+    var modal=document.getElementById("cls")
+    modal.click()
+    changeSign(element)
+  }
+  else{
+    document.querySelector('#msg').innerHTML="Incorrect PIN"
+  }
+}
+  
+  
+
+
+      
+function convertAndUpload() {
+      // Get the template element
+      element=document.getElementById('c')
+      html2canvas(element,{
+        width: document.getElementById('c').offsetWidth,
+        height: document.getElementById('c').offsetHeight
+      }).then(canvas => {
+    // canvas is a screenshot of the element with id 'c'
+    const docDefinition = {
+    content: [
+        {
+            image: canvas.toDataURL(),
+            width: 411,
+            height: 800
+            //fit:[211,198]
+            
+        }
+    ]
+  };
+
+const pdfDoc = pdfMake.createPdf(docDefinition);
+// pdfDoc.download('contract.pdf');
+
+var storageRef = firebase.storage().ref();
+var pdfRef = storageRef.child("ms_f/"+msid+"/"+fid+"/contract.pdf");
+pdfDoc.getBlob((blob) => {
+    pdfRef.put(blob).then(() => {
+      document.querySelector('#msg1').innerHTML="Process Completed."
+      console.log('PDF successfully uploaded to Firebase Storage');
+    }).catch((error) => {
+      console.error(error);
+    });
+  });
+
+
+});
+}
+
+
+  
+</script>
+  

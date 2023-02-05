@@ -1,246 +1,222 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %} Contract {% endblock %} 
 
-<style>
-  body{
-    margin: 40px;
-    width: 595px;
-    height: 842px;
-    font-family: Arial, Helvetica, sans-serif;
+{% block content %}
+    <style>
+      .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+      }
 
-  }
-  
-  #contract_pg_1 h1{
-    text-align: center;
-  }
-  .sign-box {
-  width: 80px;
-  height: 80px;
-  border: 2px solid black;
-  display: inline-block;
-}
+      .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+      }
 
-.sign-box.clicked::before {
-  content: "✔";
-  font-size: 70px;
-  color: green;
-  position: relative;
+      .tab button:hover {
+        background-color: #ddd;
+      }
 
-  /* transform: translate(-50%, -50%); */
-}
+      .tab button.active {
+        background-color: #ccc;
+      }
 
-.sign-box1 {
-  width: 80px;
-  height: 80px;
-  border: 2px solid black;
-  display: inline-block;
-}
-
-.sign-box1::before {
-  content: "✔";
-  font-size: 70px;
-  color: green;
-  position: relative;
-
-  /* transform: translate(-50%, -50%); */
-}
-
-.container {
-    display: grid;
-    grid-template-columns: 50% 50%;
-  }
-.item {
-    
-    /* padding: 20px; */
-    text-align: center;
-
-  }
- 
-
-</style>
+      .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+      }
+    </style>
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/vfs_fonts.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
 
+  </head>
+  <body>
+    <div class="tab">
+      <button id="inprogress" class="tablinks" onclick="openTab(event, 'inprogressText')">In Progress</button>
+      <button id="completed" class="tablinks" onclick="openTab(event, 'completedText')">Completed</button>
+    </div>
+    <div id="inprogressText" class="tabcontent">
+    </div>
+    <div id="completedText" class="tabcontent">
+     <p>c</p>
+    </div>
 
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body id="body" >
-  
-     
-
-  <div id="c">
-    
-  <div id='contract_pg_1'>
-
-
-    <h1>Milk Supply Contract</h1>
-    <h3>Prepared for:</h3>
-    <p>{{f_name}}</p>
-    <p>Farmer</p>
-    <p>{{f_add}}</p>
-    <p>{{phn}}</p>
-    
-    <h3>Created by:</h3>
-    <p>{{ms_name}}</p>
-    <p>Milk Society</p>
-    <p>{{ms_add}}</p>
-    <p>{{ms_email}}</p>
-    <p>
-      This Supply Agreement, herein referred to as “Agreement,” is made effective on {{start_date}} by and between "{{ms_name}}", herein frequently referred to as "Purchaser," and "{{f_name}}", herein frequently referred to as "Supplier".<br>
-      Supplier and Purchaser may be referred to as individually as "Party" or collectively as the "Parties."<br>
-      Whereas:<br>
-      A) The Supplier is engaged in the business of supplying certain goods as defined below;<br>
-      B) The Purchaser wishes to acquire certain goods from the Supplier as defined below;<br>
-      Now, therefore, the Parties agree as follows:<br>
-  
-    </p>
-    <br>
-        
-  </div>
-  <div id="contract_pg_2">
-    <h3>Scope</h3>
-    <p>
-      The purpose of this Agreement is to set out the provisions under which Supplier will deliver to Purchaser the "Products" as described in the following clause.
-      The purchases of all Products by Purchaser from Supplier shall be exclusively subject to the provisions of this Agreement.<br>
-      Both Parties acknowledge that this Agreement forms the basis of the contractual relationship between the Parties and waive application of their respective standard terms and conditions that typically apply to such transactions.
-    </p>
-    <h3>Product</h3>
-    <p>
-      The Supplier shall supply the following Product:
-      <h5>Milk type: {{type}}</h5>
-      <h5>Quantity(Ltr): {{qty}}</h5>
-      <h5>Delivery: Daily</h5>
-      <h5>Min fat% in milk: {{minfat}}</h5>
-      <h5>Shift(delivery time): {{shift}}</h5>
-    </p>
-    <h3>Supply of product</h3>
-    <p>
-      During the term of this Agreement and any extension thereof,
-      the Supplier shall sell and supply the products to the Purchaser, and the Purchaser shall buy the products from Supplier
-      exclusively/non-exclusively. The Purchaser shall have the right to inspect the Products upon delivery for any potential deficiencies or defects.
-    </p>
-    <h3>Pricing</h3>
-    <p>
-      Supplier shall be paid according to the fat content in his/her supplied milk.
-    </p>
-    <br>
-  </div>
-  <div id="contract_pg_3">
-    <h3>Payment Terms</h3>
-    <p>Supplier shall be paid on the daily basis.</p>
-    <h3>Force majeure</h3>
-    <p id='pid'>Supplier shall not be held responsible for delays or damages caused by reason of force majeure such as due to flood, earthquake, war, or in cases of inclement weather that shall impact the delivery of the goods to the Purchaser in any way. Supplier shall notify the Purchaser as soon as possible regarding any such incident.</p>
-    <h3>Terms and Termination</h3>
-    <p>This Agreement shall begin on the date listed at the beginning of this document and shall remain in effect for the duration of {{d}} months until {{end_date}} unless this Agreement is terminated sooner as listed in this provision or elsewhere within this Agreement.<br>
-    A)The Party must supply only clean and fresh milk.<br>
-    B)Supplied milk should have the min fat%, if this condition is not meet then Purchaser has the right to reject the milk & supplier wont't be paid.<br>
-    C)Purchaser has the right to terminate the Contract if the quality of the milk is not according the the aggrement.</p>
-    <h4>Note: Green tick indicates contract is from valid party.</h4>
-
-</div>
-<div class="container">
-  <div class="item">
-    <span class="sign-box1"></span>
-
-    <p>{{ms_name}}(Milk Society )</p>
-  </div>
-  <div class="item">
-    <span class="sign-box" onclick="changeSign(this)" ></span>
-    <p>{{f_name}}(Farmer)</p>
-
-
-  </div>
-
-
-</div>
-
-
-
-</div>
-</div>
-
-<button type="button" onclick="convertAndUpload()" style="width: 100px;height: 40px;margin-left: 250px;">Accept Contract</button>
-
-</body>
+  </body>
 </html>
-<script>
-  var path=JSON.parse('{{ path|escapejs }}');
-
-const boxes = document.querySelectorAll('.box');
-
-boxes.forEach(box => {
-  box.addEventListener('click', () => {
-    const icon = box.querySelector('.icon');
-    icon.style.display = icon.style.display === 'block' ? 'none' : 'block';
-  });
-});
-
-function changeSign(element) {
-  element.classList.toggle("clicked");
-}
-  
-  
-const firebaseConfig = {
-apiKey: "AIzaSyCWzp6-kj52hdmmhDfR810nJLLfJkrxS5I",
-authDomain: "ng-test-fb229.firebaseapp.com",
-databaseURL: "https://ng-test-fb229-default-rtdb.firebaseio.com",
-projectId: "ng-test-fb229",
-storageBucket: "ng-test-fb229.appspot.com",
-messagingSenderId: "841168642654",
-appId: "1:841168642654:web:c9a1ad16dddda7bfa88acf"
-};
-firebase.initializeApp(firebaseConfig);
-
-
-      
-function convertAndUpload() {
-      // Get the template element
-      element=document.getElementById('c')
-      html2canvas(element,{
-        width: document.getElementById('c').offsetWidth,
-        height: document.getElementById('c').offsetHeight
-      }).then(canvas => {
-    // canvas is a screenshot of the element with id 'c'
-    const docDefinition = {
-    content: [
-        {
-            image: canvas.toDataURL(),
-            width: 411,
-            height: 800
-            //fit:[211,198]
-            
+    <script>
+      function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = "none";
         }
-    ]
-  };
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+      }
+      const firebaseConfig = {
+    apiKey: "AIzaSyCWzp6-kj52hdmmhDfR810nJLLfJkrxS5I",
+    authDomain: "ng-test-fb229.firebaseapp.com",
+    databaseURL: "https://ng-test-fb229-default-rtdb.firebaseio.com",
+    projectId: "ng-test-fb229",
+    storageBucket: "ng-test-fb229.appspot.com",
+    messagingSenderId: "841168642654",
+    appId: "1:841168642654:web:c9a1ad16dddda7bfa88acf"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db=firebase.firestore()
+    var msid=JSON.parse('{{ msid|escapejs }}');
+    var key=JSON.parse('{{ key|escapejs }}');
 
-const pdfDoc = pdfMake.createPdf(docDefinition);
-// pdfDoc.download('contract.pdf');
+    var district = db.collection(key);
 
-var storageRef = firebase.storage().ref();
-var pdfRef = storageRef.child(path+"/contract.pdf");
-pdfDoc.getBlob((blob) => {
-    pdfRef.put(blob).then(() => {
-      console.log('PDF successfully uploaded to Firebase Storage');
-    }).catch((error) => {
-      console.error(error);
-    });
+var milkSocietyRef = district.doc("milkSociety");
+
+var districtMsRef = milkSocietyRef.collection("district_ms");
+var msdoc = districtMsRef.doc(msid);
+
+var contract=msdoc.collection('Contract')
+contract.onSnapshot(function(snapshot) {
+  snapshot.docChanges().forEach(function(change) {
+    if (change.type === "added") {
+      var fid=change.doc.id
+      var data=change.doc.data()
+      console.log(data['f_name']);
+      create_card(fid,data,0)
+
+
+    }
+    if (change.type === "modified") {
+      console.log("Modified doc: ", change.doc.data());
+    }
+    if (change.type === "removed") {
+      card=document.querySelector('#'+change.doc.id)
+      document.querySelector('#inprogressText').removeChild(card)
+    }
   });
-
-
 });
+
+function create_card(fid,data,chk) {
+
+// Create card element
+var card = document.createElement("div");
+card.className = "card w-80";
+card.id=fid
+
+// Create card header
+var cardHeader = document.createElement("h5");
+cardHeader.className = "card-header";
+cardHeader.innerHTML = "Farmer "+data['f_name'];
+cardHeader.style.backgroundColor = "rgb(209, 219, 219)";
+
+// Create card body
+var cardBody = document.createElement("div");
+cardBody.className = "card-body";
+
+// Create card title
+var cardTitle = document.createElement("h6");
+cardTitle.className = "card-title";
+cardTitle.innerHTML = "Contract Details";
+
+cardBody.appendChild(cardTitle);
+// Create card text
+var cardText = document.createElement("p");
+cardText.className = "card-text";
+cardText.innerHTML = "Milk Type: "+data['milk_type']
+cardBody.appendChild(cardText);
+
+
+var cardText = document.createElement("p");
+cardText.className = "card-text";
+cardText.innerHTML = "Shift: "+data['shift']
+cardBody.appendChild(cardText);
+
+
+var cardText = document.createElement("p");
+cardText.className = "card-text";
+cardText.innerHTML = "Quantity(in Ltr): "+data['qty']
+cardBody.appendChild(cardText);
+
+var cardText = document.createElement("p");
+cardText.className = "card-text";
+cardText.innerHTML = "Status: "+data['status']
+cardBody.appendChild(cardText);
+
+var cardText = document.createElement("p");
+cardText.className = "card-text";
+rt=data['end_date'].toDate()
+let fd = rt.toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
+cardText.innerHTML = "Contract End Date: "+fd
+cardBody.appendChild(cardText);
+// Create button
+var button = document.createElement("button");
+var icon = document.createElement("i");
+icon.classList.add("fas", "fa-eye");
+button.appendChild(icon);
+button.className = "btn btn-info";
+button.innerHTML += " View Contract";
+button.setAttribute("target", "_blank");
+button.setAttribute("href", data['url']);
+button.style.position='absolute'
+button.style.bottom='10px'
+button.style.right='10px'
+// Append elements to card body
+cardBody.appendChild(button);
+
+
+var button = document.createElement("button");
+var icon = document.createElement("i");
+icon.classList.add("fas", "fa-trash");
+button.appendChild(icon);
+button.className = "btn btn-danger";
+button.innerHTML += " Remove";
+// button.setAttribute('disabled','disabled')
+button.style.position='absolute'
+button.style.bottom='60px'
+button.style.right='10px'
+// Append elements to card body
+button.onclick=function (){
+    contract.doc(fid).delete()
+
+
+}
+cardBody.appendChild(button);
+
+
+// Append header and body to card
+card.appendChild(cardHeader);
+card.appendChild(cardBody);
+
+// Add card to document
+var br = document.createElement("br");
+if (chk==0){
+
+    document.getElementById("inprogressText").appendChild(card);
+    document.getElementById("inprogressText").appendChild(br);
+}
+else{
+    document.getElementById("completed").appendChild(card);
+    document.getElementById("completed").appendChild(br);
+}
 }
 
+    </script>
 
-  
-</script>
-  
+
+{% endblock %} 

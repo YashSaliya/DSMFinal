@@ -19,7 +19,7 @@ from django.shortcuts import redirect
 from dsm.settings import apikey
 from django.shortcuts import render
 from firebase_admin import auth
-
+import random
 
 cred = firebase_admin.credentials.Certificate("certificate.json")
 
@@ -165,7 +165,7 @@ def notification(request):
     if request.method!='POST':
         
         return render(request,"notification.html",{'msid':json.dumps(request.session['user']),
-        'data':json.dumps(data),'form':form})
+        'data':json.dumps(data),'form':form,'key':json.dumps(key)})
     else:
         form = contract_details(request.POST)
         if form.is_valid():
@@ -173,6 +173,7 @@ def notification(request):
             print(data)
             fuser=auth.get_user(data['fid'])
             print(fuser.phone_number)
+            pin = random.randrange(1000,9999)
             d={
                 'f_name':data['farmer'],
                 'ms_name':data['milk_society'],
@@ -185,21 +186,31 @@ def notification(request):
                 'start_date':data['start_date'],
                 'end_date':data['end_date'],
                 'd':data['duration'],
-                'minfat':data['min_fat_cow'],
-                'path':json.dumps('mypath'),
-                'phn':fuser.phone_number
+                'fid':json.dumps(data['fid']),
+                'msid':json.dumps(request.session['user']),
+                'phn':fuser.phone_number,
+                'pin':json.dumps(pin)
                       
 
             }
+            if d['type']=='Cow':
+                d['minfat']=data['min_fat_cow']
+            elif d['type']=='Buffalo':
+                d['minfat']=data['min_fat_buffalo']
+            elif d['type']=='Both':
+                d['minfat_buffalo']=data['min_fat_buffalo']
+                d['minfat_cow']=data['min_fat_cow']
+
             bucket=storage.bucket('ng-test-fb229.appspot.com')
-            html = render(request, 'contract.html', d).content
+            html = render(request, 'ms_f_contract.html', d).content
             
             blob = bucket.blob("ms_f/"+request.session['user']+"/"+data['fid']+"/contract.html")
             blob.upload_from_string(html, 'text/html')
+            
            
             url = blob.generate_signed_url(
                 expiration=timedelta(weeks=1),
-                method='GET'
+                method='GET',
             )
 
             # Use the URL to access the file
@@ -209,21 +220,27 @@ def notification(request):
             req_collection=farmer_doc.collection('Request').document(request.session['user'])
             req_collection.set({
                 'msid':request.session['user'],
-                'url':url
+                'url':url,
+                'pin':pin
             })
+            doc_ref.collection('Contract').document(data['fid']).set({
+                'f_name':data['farmer'],
+                'milk_type':data['milk_type'],
+                'qty':data['milk_qty'],
+                'shift':data['shift'],
+                'end_date':datetime.combine(data['end_date'], datetime.min.time()),
+                'url':url,
+                'status':'Farmer Verification Pending'
 
-
-
-
-           
+            })
             
-            return render(request,'contract.html',d)
+            return render(request,'ms_f_contract.html',d)
         else:
             messages.warning(request,form.errors)
             return render(request,"notification.html",{'msid':json.dumps(request.session['user']),
-            'data':json.dumps(data),'form':form})
+        'data':json.dumps(data),'form':form,'key':json.dumps(key)})
 
+def contract(request):
+    key=db.collection("Cluster_key").document(request.session['user']).get().get("key")
 
-        
-        
-
+    return render(request,'contract.html',{'msid':json.dumps(request.session['user']),'key':json.dumps(key)})
