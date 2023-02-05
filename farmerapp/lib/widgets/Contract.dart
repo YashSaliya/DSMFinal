@@ -1,28 +1,26 @@
+// ignore_for_file: file_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:farmerapp/home/screens/documentview.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
-class ContractCard extends StatelessWidget{
+class ContractCard extends StatelessWidget {
   final DocumentSnapshot ds;
   const ContractCard({Key? key, required this.ds}) : super(key: key);
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Card(
       child: ListTile(
         title: Text(ds.get('name')),
         subtitle: ElevatedButton(
-          child: Text("View"),
-          onPressed: () async{
+          child: const Text("View"),
+          onPressed: () async {
             String url = ds.get('url');
             final file = await loadPdfFromNetwork(url);
             openPdf(context, file, url);

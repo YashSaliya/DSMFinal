@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_unnecessary_containers, sized_box_for_whitespace, unused_local_variable, avoid_print
+
 import 'dart:io';
 import 'package:farmerapp/locators/geolocatorfun.dart';
 import 'package:intl/intl.dart';
@@ -384,8 +386,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                 String userId =
                                     instance.get('userId').toString();
                                 determinePosition().then((Position pos) async {
-                                  await FirebaseFirestore.instance.collection('Cluster_key').doc(userId).set({'key':cityValue!});
-                                  FirebaseFirestore.instance.collection(cityValue!).doc('milkSociety').collection('district_farmer').doc(userId).set({
+                                  await FirebaseFirestore.instance
+                                      .collection('Cluster_key')
+                                      .doc(userId)
+                                      .set({'key': cityValue!});
+                                  FirebaseFirestore.instance
+                                      .collection(cityValue!)
+                                      .doc('milkSociety')
+                                      .collection('district_farmer')
+                                      .doc(userId)
+                                      .set({
                                     'latitude': pos.latitude,
                                     'longitude': pos.longitude,
                                     'full_name': nameController.text,
@@ -400,8 +410,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                               Homepage(cityVal: cityName!.toString()),
+                                        builder: (context) => Homepage(
+                                            cityVal: cityName!.toString()),
                                       ),
                                     );
                                   });
