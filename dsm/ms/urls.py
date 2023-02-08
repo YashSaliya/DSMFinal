@@ -9,6 +9,8 @@ urlpatterns = [
     path('logout',postlogout,name = 'logout'),
     path('profileupdate',profile,name= 'profile'),
     path('notification',notification,name= 'notification'),
-    path('contract',contract,name='contract')
+    path('contract',contract,name='contract'),
+    path('sms',temp),
+
     # path('addemailpass',asyncRequest,name = 'sendVerificationLink'),
 ]

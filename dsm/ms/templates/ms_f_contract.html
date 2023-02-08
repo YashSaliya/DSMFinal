@@ -68,6 +68,8 @@
     <meta charset="UTF-8">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
@@ -209,7 +211,7 @@
     <p>{{ms_name}}(Milk Society )</p>
   </div>
   <div class="item">
-    <span class="sign-box" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="myfun(this)"></span>
+    <span class="sign-box" onclick="myfun(this)" data-bs-toggle="modal" data-bs-target="#exampleModal" ></span>
     <p>{{f_name}}(Farmer)</p>
   </div>
 </div>
@@ -223,6 +225,8 @@
   var fid=JSON.parse('{{ fid|escapejs }}');
   var msid=JSON.parse('{{ msid|escapejs }}');
   var pin=JSON.parse('{{ pin|escapejs }}');
+
+  var key=JSON.parse('{{ key|escapejs }}');
   const firebaseConfig = {
     apiKey: "AIzaSyCWzp6-kj52hdmmhDfR810nJLLfJkrxS5I",
     authDomain: "ng-test-fb229.firebaseapp.com",
@@ -232,7 +236,8 @@
     messagingSenderId: "841168642654",
     appId: "1:841168642654:web:c9a1ad16dddda7bfa88acf"
     };
-    app=firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
+    db=firebase.firestore()
 
 let element=null
 function myfun(ele){
@@ -298,6 +303,24 @@ var storageRef = firebase.storage().ref();
 var pdfRef = storageRef.child("ms_f/"+msid+"/"+fid+"/contract.pdf");
 pdfDoc.getBlob((blob) => {
     pdfRef.put(blob).then(() => {
+      var district = db.collection(key);
+
+  var milkSocietyRef = district.doc("milkSociety");
+
+  var districtMsRef = milkSocietyRef.collection("district_ms");
+
+  var msdoc = districtMsRef.doc(msid);
+
+  var contract=msdoc.collection('Contract')
+  var farmer=contract.doc(fid)
+      pdfRef.getDownloadURL().then(function(url) {
+        farmer.update({
+          'status':"Completed",
+          'url':url
+        })
+          
+      })
+
       document.querySelector('#msg1').innerHTML="Process Completed."
       console.log('PDF successfully uploaded to Firebase Storage');
     }).catch((error) => {

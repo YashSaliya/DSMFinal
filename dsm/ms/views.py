@@ -20,7 +20,7 @@ from dsm.settings import apikey
 from django.shortcuts import render
 from firebase_admin import auth
 import random
-
+from twilio.rest import Client
 cred = firebase_admin.credentials.Certificate("certificate.json")
 
 app = firebase_admin.initialize_app(cred)
@@ -189,7 +189,8 @@ def notification(request):
                 'fid':json.dumps(data['fid']),
                 'msid':json.dumps(request.session['user']),
                 'phn':fuser.phone_number,
-                'pin':json.dumps(pin)
+                'pin':json.dumps(pin),
+                'key':json.dumps(key)
                       
 
             }
@@ -242,5 +243,58 @@ def notification(request):
 
 def contract(request):
     key=db.collection("Cluster_key").document(request.session['user']).get().get("key")
+    form=contract_terminate_detail()
+    if request.method!='POST':
 
-    return render(request,'contract.html',{'msid':json.dumps(request.session['user']),'key':json.dumps(key)})
+
+        return render(request,'contract.html',{'form':form,'msid':json.dumps(request.session['user']),'key':json.dumps(key)})
+
+    else:
+        iform=contract_terminate_detail(request.POST)
+        if iform.is_valid():
+            data=iform.cleaned_data
+            print(data)
+            db.collection(key).document('milkSociety').collection('district_ms').\
+            document(request.session['user']).collection('Contract').document(data['fid']).update({
+                'reason':data['reason'],
+                'status':"Terminated",
+                'url':"",
+                
+            })
+            ms_name=db.collection(key).document('milkSociety').collection('district_ms').document(request.session['user']).get().get('name')
+            account_sid = config('sms_api')
+            auth_token = config('sms_auth')
+            client = Client(account_sid, auth_token)
+
+            message = client.messages\
+                    .create(
+                        body=f"This is to inform you that your Milk Supply Contract with {ms_name} has been terminated.Reason:{data['reason']}",
+                        from_='+17656263877',
+                        to='+919324709499'
+                    )
+            print(message.sid)
+            bucket=storage.bucket('ng-test-fb229.appspot.com')
+            blob = bucket.blob("ms_f/"+request.session['user']+"/"+data['fid']+"/contract.html")
+            blob.delete()
+
+
+        return render(request,'contract.html',{'form':form,'msid':json.dumps(request.session['user']),'key':json.dumps(key)})
+        
+        
+
+
+
+def temp(request):
+    account_sid = config('sms_api')
+    auth_token = config('sms_auth')
+    client = Client(account_sid, auth_token)
+
+    message = client.messages\
+                    .create(
+                        body="hello from dsm project",
+                        from_='+17656263877',
+                        to='+919324709499'
+                    )
+
+    print(message.sid)
+    return HttpResponse()                         

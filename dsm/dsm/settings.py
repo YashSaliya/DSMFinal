@@ -27,7 +27,8 @@ from decouple import config
 
 # Example of how to use the variables
 apikey = config('api_key')
-
+sms_api=config('sms_api')
+sms_auth=config('sms_auth')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-a!dt077g5y@r^t2yqyugfw8tvua+2n08i=w-%z43sjv^gyb7j!'
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ms',
+    'sms',
     'corsheaders'
 ]
 
@@ -141,12 +143,15 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'statics')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'statics/images')
-
-
-# Default primary key field type
+SMS_BACKEND = 'sms.backends.twilio.SmsBackend'
+SMS_BACKEND_SETTINGS = {
+    'api_key': 'SK88f65ceba53c6cb594d511a60c077626',
+    'sender': 'sender_name',
+}# Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MESSAGE_TAGS = {
     messages.ERROR :'danger'
 }
+# sQVMdmh7upUfgOMTfMmfMPHJPmEEzWHq

@@ -40,6 +40,8 @@
   <head>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
 
   </head>
@@ -47,16 +49,60 @@
     <div class="tab">
       <button id="inprogress" class="tablinks" onclick="openTab(event, 'inprogressText')">In Progress</button>
       <button id="completed" class="tablinks" onclick="openTab(event, 'completedText')">Completed</button>
+      <button id="past" class="tablinks" onclick="openTab(event, 'pastc')">Past Contract</button>
+
     </div>
     <div id="inprogressText" class="tabcontent">
     </div>
     <div id="completedText" class="tabcontent">
      <p>c</p>
     </div>
+    <div id="pastc" class="tabcontent">
+      <p>c</p>
+     </div>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title font-weight-normal" id="exampleModalLabel">Enter Contract Termination Reason</h5>
+            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="container-md rounded">
+              <div class = "card">
+                  <!-- <div class = "card-title"> <h2 class=" mt-3 mb-4 display-4 text-center"></h2>   </div> -->
+                  <div class = "card-body"> 
+                      <form id="my-form" class = "form-container" method = "POST" action = "{% url 'contract' %}">
+                          {% csrf_token %}
+                          {% for field in form %}
+                              <div class = "form form-group">
+                                  <div class="input-group input-group-static mt-2">
+                                      <label class = "input-group input-group-static">{{ field.label_tag }}</label>
+                                      {{ field }}
+                                  </div>
+                              </div>
+                          {% endfor %}
+                          
+                          <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn bg-gradient-primary">Make Contract</button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
 
   </body>
 </html>
     <script>
+      let t  = document.getElementsByClassName('form form-group');
+      t[t.length-1].setAttribute('hidden','true')
       function openTab(evt, tabName) {
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
@@ -94,15 +140,36 @@ var msdoc = districtMsRef.doc(msid);
 var contract=msdoc.collection('Contract')
 contract.onSnapshot(function(snapshot) {
   snapshot.docChanges().forEach(function(change) {
+    var fid=change.doc.id
+    var data=change.doc.data()
     if (change.type === "added") {
-      var fid=change.doc.id
-      var data=change.doc.data()
-      console.log(data['f_name']);
+      if (data['status']=='Completed'){
+        create_card(fid,data,1)
+      }
+      else if(data['status']=='Terminated'){
+        create_card(fid,data,2)
+      }
+      else{
       create_card(fid,data,0)
+
+      }
 
 
     }
     if (change.type === "modified") {
+      if (data['status']=='Completed'){
+        card=document.querySelector('#'+change.doc.id)
+        document.querySelector('#inprogressText').removeChild(card)
+        
+        create_card(fid,data,1)
+      }
+      else if (data['status']=='Terminated'){
+        card=document.querySelector('#'+change.doc.id)
+        document.querySelector('#CompletedText').removeChild(card)
+        
+        create_card(fid,data,2)
+      }
+      
       console.log("Modified doc: ", change.doc.data());
     }
     if (change.type === "removed") {
@@ -156,47 +223,101 @@ cardBody.appendChild(cardText);
 var cardText = document.createElement("p");
 cardText.className = "card-text";
 cardText.innerHTML = "Status: "+data['status']
+if(data['status']=="Completed"){
+  cardText.style.color="green"
+
+}
+if(data['status']=="Rejected"){
+  cardText.style.color="red"
+
+}
 cardBody.appendChild(cardText);
 
 var cardText = document.createElement("p");
 cardText.className = "card-text";
+
 rt=data['end_date'].toDate()
 let fd = rt.toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
 cardText.innerHTML = "Contract End Date: "+fd
 cardBody.appendChild(cardText);
+
+var cardText = document.createElement("p");
+cardText.className = "card-text";
+var today=new Date()
+var diff = rt-today;
+var diffInDays = Math.ceil(diff / 86400000);
+cardText.innerHTML = "Contract Validity(days): "+diffInDays
+cardBody.appendChild(cardText);
+
 // Create button
-var button = document.createElement("button");
+if(chk!=2){
+var button = document.createElement("a");
 var icon = document.createElement("i");
 icon.classList.add("fas", "fa-eye");
 button.appendChild(icon);
-button.className = "btn btn-info";
+button.className = "btn btn-primary";
 button.innerHTML += " View Contract";
-button.setAttribute("target", "_blank");
 button.setAttribute("href", data['url']);
+button.setAttribute("target", "_blank");
 button.style.position='absolute'
 button.style.bottom='10px'
 button.style.right='10px'
-// Append elements to card body
 cardBody.appendChild(button);
-
-
-var button = document.createElement("button");
-var icon = document.createElement("i");
-icon.classList.add("fas", "fa-trash");
-button.appendChild(icon);
-button.className = "btn btn-danger";
-button.innerHTML += " Remove";
-// button.setAttribute('disabled','disabled')
-button.style.position='absolute'
-button.style.bottom='60px'
-button.style.right='10px'
-// Append elements to card body
-button.onclick=function (){
-    contract.doc(fid).delete()
-
 
 }
-cardBody.appendChild(button);
+
+
+
+
+if(chk==0){
+
+  var button = document.createElement("button");
+  var icon = document.createElement("i");
+  icon.classList.add("fas", "fa-trash");
+  button.appendChild(icon);
+  button.className = "btn btn-danger";
+  button.innerHTML += " Remove";
+  if(data['status']=="Pending"){
+
+  button.setAttribute('disabled','disabled')
+  }
+  button.style.position='absolute'
+  button.style.bottom='60px'
+  button.style.right='10px'
+  // Append elements to card body
+  button.onclick=function (){
+      contract.doc(fid).delete()
+
+  }
+  cardBody.appendChild(button);
+}
+if(data['status']=='Completed'){
+
+  var button = document.createElement("button");
+  var icon = document.createElement("i");
+  icon.classList.add("fas", "fa-trash");
+  button.appendChild(icon);
+  button.className = "btn btn-danger";
+  button.innerHTML += " Terminate";
+  button.style.position='absolute'
+  button.style.bottom='60px'
+  button.style.right='10px'
+
+  button.onclick=function (){
+      // contract.doc(fid).delete()
+      $("#exampleModal").modal("show")
+      document.querySelector('#id_fid').value=fid
+
+  }
+  cardBody.appendChild(button);
+}
+if(chk==2){
+
+var cardText = document.createElement("p");
+cardText.className = "card-text";
+cardText.innerHTML = "Reason: "+data['reason']
+cardBody.appendChild(cardText);
+}
 
 
 // Append header and body to card
@@ -210,9 +331,13 @@ if (chk==0){
     document.getElementById("inprogressText").appendChild(card);
     document.getElementById("inprogressText").appendChild(br);
 }
+else if (chk==1){
+    document.getElementById("completedText").appendChild(card);
+    document.getElementById("completedText").appendChild(br);
+}
 else{
-    document.getElementById("completed").appendChild(card);
-    document.getElementById("completed").appendChild(br);
+  document.getElementById("pastc").appendChild(card);
+  document.getElementById("pastc").appendChild(br);
 }
 }
 

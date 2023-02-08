@@ -127,6 +127,15 @@ class RegisterForm(forms.Form):
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
 
+class contract_terminate_detail(forms.Form):
+    reason=forms.CharField()
+    fid=forms.CharField(widget=forms.HiddenInput())
+    def __init__(self:forms.Form,*args,**kwargs):
+        super(contract_terminate_detail,self).__init__(*args,**kwargs)
+        
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class':'form-control'})
+
 
 class contract_details(forms.Form):
  
