@@ -84,7 +84,145 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <script>
+    var fid=JSON.parse('{{ fid|escapejs }}');
+    var msid=JSON.parse('{{ msid|escapejs }}');
+    var pin=JSON.parse('{{ pin|escapejs }}');
+  
+    var key=JSON.parse('{{ key|escapejs }}');
+    // var pin = 123;
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWzp6-kj52hdmmhDfR810nJLLfJkrxS5I",
+      authDomain: "ng-test-fb229.firebaseapp.com",
+      databaseURL: "https://ng-test-fb229-default-rtdb.firebaseio.com",
+      projectId: "ng-test-fb229",
+      storageBucket: "ng-test-fb229.appspot.com",
+      messagingSenderId: "841168642654",
+      appId: "1:841168642654:web:c9a1ad16dddda7bfa88acf"
+      };
+      firebase.initializeApp(firebaseConfig);
+      db=firebase.firestore()
+  
+  let element=null
+  function myfun(ele){
+    element=ele
+  }
+  
+  
+  const boxes = document.querySelectorAll('.box');
+  
+  boxes.forEach(box => {
+    box.addEventListener('click', () => {
+      const icon = box.querySelector('.icon');
+      icon.style.display = icon.style.display === 'block' ? 'none' : 'block';
+    });
+  });
+  function changeSign(element) {
+    element.classList.toggle("clicked");
+    
+    a=document.querySelector('#acpt-btn')
+    a.disabled = !a.disabled;  
+  }
+  function chk_pin(){
+    var x=document.querySelector('#mypin').value
+    if (x==pin){
+      var modal=document.getElementById("cls")
+      modal.click()
+      changeSign(element)
+    }
+    else{
+      document.querySelector('#msg').innerHTML="Incorrect PIN"
+    }
+  }
+    
+    
+  
+  
+        
+  async function  convertAndUpload(){
+        // Get the template element
+        element=document.getElementById('c')
+        html2canvas(document.getElementById('signfields')).then(canvas => {
+      const docDefinition = {
+      content: [
+      htmlToPdfmake(element.innerHTML),
+      {
+        image: canvas.toDataURL(),
+        width: 500,
+        
+      }
+  
+      ]
+    };
+  
+  const pdfDoc = pdfMake.createPdf(docDefinition);
+  // pdfDoc.download('contract.pdf');
+  
+  var storageRef = firebase.storage().ref();
+  var pdfRef = storageRef.child("ms_f/"+msid+"/"+fid+"/contract.pdf");
+  pdfDoc.getBlob((blob) => {
+      pdfRef.put(blob).then(() => {
+        var district = db.collection(key);
+  
+    var milkSocietyRef = district.doc("milkSociety");
+  
+    var districtMsRef = milkSocietyRef.collection("district_ms");
+  
+  
+  
+    var msdoc = districtMsRef.doc(msid);
+    
+    var msdocDetails =  msdoc.get().then((doc)=>{
+    var msdocdata = doc.data();
+    
+    var initialCounter = msdocdata['counter'];
+    console.log(initialCounter);
+    var counter = initialCounter + 1;
+
+    msdoc.update({
+      'counter':counter,
+    });
+
+
+
+  
+    var contract=msdoc.collection('Contract')
+    var farmer=contract.doc(fid)
+  
+        pdfRef.getDownloadURL().then(function(url) {
+          farmer.update({
+            'status':"Completed",
+            'url':url,
+            'token':initialCounter
+          });
+          milkSocietyRef.collection('district_farmer').doc(fid).collection('Contract').doc(msid).set({
+        'status':"Completed",
+        'url':url,
+        'token':initialCounter
+        });
+            
+        })
+        
+        document.querySelector('#msg1').innerHTML="Process Completed."
+        console.log('PDF successfully uploaded to Firebase Storage');
+      }).catch((error) => {
+        console.error(error);
+      });
+    });
+
+
+    });
+  
+  
+  });
+  }
+  
+  
+    
+  </script>
 </head>
+
+  
 <body id="body" >
   <!-- Button trigger modal -->
 <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -223,120 +361,4 @@
 <button id="acpt-btn" class="btn btn-primary" style="margin-left: 250px" data-bs-toggle="modal" data-bs-target="#exampleModal1" onclick="convertAndUpload()" disabled="disabled">Accept Contract</button>
 </body>
 </html>
-<script>
-  var fid=JSON.parse('{{ fid|escapejs }}');
-  var msid=JSON.parse('{{ msid|escapejs }}');
-  var pin=JSON.parse('{{ pin|escapejs }}');
 
-  var key=JSON.parse('{{ key|escapejs }}');
-  const firebaseConfig = {
-    apiKey: "AIzaSyCWzp6-kj52hdmmhDfR810nJLLfJkrxS5I",
-    authDomain: "ng-test-fb229.firebaseapp.com",
-    databaseURL: "https://ng-test-fb229-default-rtdb.firebaseio.com",
-    projectId: "ng-test-fb229",
-    storageBucket: "ng-test-fb229.appspot.com",
-    messagingSenderId: "841168642654",
-    appId: "1:841168642654:web:c9a1ad16dddda7bfa88acf"
-    };
-    firebase.initializeApp(firebaseConfig);
-    db=firebase.firestore()
-
-let element=null
-function myfun(ele){
-  element=ele
-
-}
-
-
-const boxes = document.querySelectorAll('.box');
-
-boxes.forEach(box => {
-  box.addEventListener('click', () => {
-    const icon = box.querySelector('.icon');
-    icon.style.display = icon.style.display === 'block' ? 'none' : 'block';
-  });
-});
-function changeSign(element) {
-  element.classList.toggle("clicked");
-  
-  a=document.querySelector('#acpt-btn')
-  a.disabled = !a.disabled;  
-}
-function chk_pin(){
-  var x=document.querySelector('#mypin').value
-  if (x==pin){
-    var modal=document.getElementById("cls")
-    modal.click()
-    changeSign(element)
-  }
-  else{
-    document.querySelector('#msg').innerHTML="Incorrect PIN"
-  }
-}
-  
-  
-
-
-      
-function convertAndUpload() {
-      // Get the template element
-      element=document.getElementById('c')
-      html2canvas(document.getElementById('signfields')).then(canvas => {
-    const docDefinition = {
-    content: [
-    htmlToPdfmake(element.innerHTML),
-    {
-      image: canvas.toDataURL(),
-      width: 500,
-      
-    }
-
-    ]
-  };
-
-const pdfDoc = pdfMake.createPdf(docDefinition);
-// pdfDoc.download('contract.pdf');
-
-var storageRef = firebase.storage().ref();
-var pdfRef = storageRef.child("ms_f/"+msid+"/"+fid+"/contract.pdf");
-pdfDoc.getBlob((blob) => {
-    pdfRef.put(blob).then(() => {
-      var district = db.collection(key);
-
-  var milkSocietyRef = district.doc("milkSociety");
-
-  var districtMsRef = milkSocietyRef.collection("district_ms");
-
-
-
-  var msdoc = districtMsRef.doc(msid);
-
-  var contract=msdoc.collection('Contract')
-  var farmer=contract.doc(fid)
-      pdfRef.getDownloadURL().then(function(url) {
-        farmer.update({
-          'status':"Completed",
-          'url':url
-        });
-        milkSocietyRef.collection('district_farmer').doc(fid).collection('Contract').doc(msid).set({
-      'status':"Completed",
-      'url':url
-      });
-          
-      })
-      
-      document.querySelector('#msg1').innerHTML="Process Completed."
-      console.log('PDF successfully uploaded to Firebase Storage');
-    }).catch((error) => {
-      console.error(error);
-    });
-  });
-
-
-});
-}
-
-
-  
-</script>
-  

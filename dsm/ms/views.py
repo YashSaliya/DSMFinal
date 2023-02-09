@@ -104,6 +104,7 @@ def otherdetails(request):
             
             ms_doc = db.collection(data["district"]).document("milkSociety")
             ms=ms_doc.collection(u"district_ms").document(request.session['user'])
+            data['counter'] = 0
             ms.set(data)
 
             return render(request, 'index.html')
@@ -229,6 +230,7 @@ def notification(request):
                 'milk_type':data['milk_type'],
                 'qty':data['milk_qty'],
                 'shift':data['shift'],
+                'start_date': datetime.combine(data['start_date'],datetime.min.time()),
                 'end_date':datetime.combine(data['end_date'], datetime.min.time()),
                 'url':url,
                 'status':'Farmer Verification Pending'
@@ -303,6 +305,8 @@ def payment(request):
     key=db.collection("Cluster_key").document(request.session['user']).get().get("key")
     c=db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
         collection('Contract').get()
+    
+    opts = []
     for x in c:
         
         fields=x.to_dict()
@@ -310,7 +314,15 @@ def payment(request):
             fuser=auth.get_user(x.id)
             phn=fuser.phone_number
             name=fields['f_name']
-            
+            opts.append((x.id, fields['token']))    
+    
+    form = paymentForm()
+    form.fields['name'].choices = opts
+    rate = db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+        get().get('fatperkilorate')
 
+
+    if request.method != 'POST':
+        return render(request,'payment.html',context= {'form':form,'rate':json.dumps(rate)})
 
     return render(request,'payment.html')

@@ -5,6 +5,7 @@ import firebase_admin
 from firebase_admin import firestore
 from firebase_admin.firestore import value
 import requests
+
 indianStates = [
 ('Andhra Pradesh', 'Andhra Pradesh'),
 ('Arunachal Pradesh', 'Arunachal Pradesh'),
@@ -136,16 +137,19 @@ class contract_terminate_detail(forms.Form):
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
 
-class payment(forms.Form):
-    name=forms.ChoiceField(initial=[])
+class paymentForm(forms.Form):
+    name = forms.ChoiceField(choices = [('1','1')])
+    fatpercent = forms.FloatField()
+    qty = forms.FloatField(widget = forms.NumberInput(attrs = {'oninput':'myfun()'}))
+    amount = forms.FloatField(widget = forms.TextInput(attrs = {'readonly':'readonly'}))
     def __init__(self:forms.Form,*args,**kwargs):
-        super(payment,self).__init__(*args,**kwargs)
-        
+        super(paymentForm,self).__init__(*args,**kwargs)
+        # options = args[0]
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
 
 class contract_details(forms.Form):
- 
+
     milk_society=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     milk_society_address=forms.CharField()
     farmer=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
@@ -155,11 +159,10 @@ class contract_details(forms.Form):
     min_fat_cow=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     min_fat_buffalo=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     shift=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
-    start_date = forms.DateField(widget= forms.DateInput(attrs = {'type':'date'}))
+    start_date = forms.DateField(widget = forms.DateInput(attrs={'type':'date'}))
     duration=forms.IntegerField(widget=forms.TextInput(attrs={'placeholder':'Enter contract duration in months','oninput':'myfun()'}))
-    end_date=forms.DateField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    end_date=forms.DateField(widget=forms.TextInput(attrs={'readonly':'readonly'}),required=False)
     fid=forms.CharField(widget=forms.HiddenInput())
-
 
     
 
@@ -175,6 +178,7 @@ class contract_details(forms.Form):
 
 
 class MsRegistration(forms.Form):
+    name = forms.CharField(max_length=25)
     entity=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     state = forms.ChoiceField(choices = indianStates)
     city = forms.CharField(max_length = 100)
@@ -186,7 +190,7 @@ class MsRegistration(forms.Form):
     minFatBuffalo = forms.FloatField()
     latitude = forms.FloatField(widget=forms.HiddenInput())
     longitude = forms.FloatField(widget=forms.HiddenInput())
-
+    fatperkilorate = forms.FloatField()
     def __init__(self:forms.Form,*args,**kwargs):
         super(MsRegistration,self).__init__(*args,**kwargs)
         self.fields['entity'].initial="milkSociety"
