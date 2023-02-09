@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../home/screens/notifications.dart';
 import '../register.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -51,7 +52,13 @@ class AppDrawer extends StatelessWidget {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => ShowContracts(cityVal: cityVal)));
             },
-          )
+          ),
+          ListTile(
+            title: const Text('Notifications'),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => newContracts(cityVal: cityVal?? "",)));
+            },
+          ),
         ],
       ),
     );

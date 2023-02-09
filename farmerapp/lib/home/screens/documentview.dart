@@ -44,6 +44,8 @@ class _DocumentViewerState extends State<DocumentViewer>{
         ],
       ),
       body: PDFView(
+        swipeHorizontal: true,
+        fitPolicy: FitPolicy.HEIGHT,
         filePath: widget.file.path,
       ),
     );

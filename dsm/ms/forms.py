@@ -148,7 +148,7 @@ class contract_details(forms.Form):
     min_fat_cow=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     min_fat_buffalo=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     shift=forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
-    start_date = forms.DateField()
+    start_date = forms.DateField(widget= forms.DateInput(attrs = {'type':'date'}))
     duration=forms.IntegerField(widget=forms.TextInput(attrs={'placeholder':'Enter contract duration in months','oninput':'myfun()'}))
     end_date=forms.DateField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     fid=forms.CharField(widget=forms.HiddenInput())

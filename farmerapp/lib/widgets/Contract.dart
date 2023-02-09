@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class ContractCard extends StatelessWidget {
   final DocumentSnapshot ds;
@@ -17,13 +18,15 @@ class ContractCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Text(ds.get('name')),
+        title: Text("Text(ds.get('name'))"),
         subtitle: ElevatedButton(
           child: const Text("View"),
           onPressed: () async {
             String url = ds.get('url');
-            final file = await loadPdfFromNetwork(url);
-            openPdf(context, file, url);
+            var uri = Uri.parse(url);
+            await launchUrl(uri,mode: LaunchMode.externalApplication);
+            // final file = await loadPdfFromNetwork(url);
+            // openPdf(context, file, url);
           },
         ),
       ),

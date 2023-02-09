@@ -144,6 +144,7 @@ class _MilkSocietyEnrollState extends State<MilkSocietyEnroll> {
       'shift': shiftSelected,
       'animal': animalSelected,
       'requestTime': DateTime.now(),
+      "url": "",
     });
     Navigator.of(context).pop();
     //show toast

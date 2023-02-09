@@ -238,7 +238,7 @@ function myfun(){
   var startdate = document.getElementById("id_start_date").value;
   var duration = document.getElementById("id_duration").value;
   var enddate = new Date(startdate);
-  enddate.setMonth(enddate.getMonth() + duration);
+  enddate.setMonth(parseInt(enddate.getMonth()) + parseInt(duration));
   let timestamp = new Date(enddate);
   let date = timestamp.toLocaleDateString();
   document.getElementById("id_end_date").value = date;

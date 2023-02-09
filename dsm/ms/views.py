@@ -219,7 +219,7 @@ def notification(request):
             key=db.collection("Cluster_key").document(data['fid']).get().get("key")
             farmer_doc = db.collection(key).document("milkSociety").collection("district_farmer").document(data['fid'])
             req_collection=farmer_doc.collection('Request').document(request.session['user'])
-            req_collection.set({
+            req_collection.update({
                 'msid':request.session['user'],
                 'url':url,
                 'pin':pin
