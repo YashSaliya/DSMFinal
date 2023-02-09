@@ -297,4 +297,20 @@ def temp(request):
                     )
 
     print(message.sid)
-    return HttpResponse()                         
+    return HttpResponse()
+
+def payment(request):
+    key=db.collection("Cluster_key").document(request.session['user']).get().get("key")
+    c=db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+        collection('Contract').get()
+    for x in c:
+        
+        fields=x.to_dict()
+        if fields['status']=="Completed":
+            fuser=auth.get_user(x.id)
+            phn=fuser.phone_number
+            name=fields['f_name']
+            
+
+
+    return render(request,'payment.html')

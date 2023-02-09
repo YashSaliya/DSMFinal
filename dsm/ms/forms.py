@@ -136,6 +136,13 @@ class contract_terminate_detail(forms.Form):
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
 
+class payment(forms.Form):
+    name=forms.ChoiceField(initial=[])
+    def __init__(self:forms.Form,*args,**kwargs):
+        super(payment,self).__init__(*args,**kwargs)
+        
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class':'form-control'})
 
 class contract_details(forms.Form):
  
