@@ -11,7 +11,9 @@ urlpatterns = [
     path('notification',notification,name= 'notification'),
     path('contract',contract,name='contract'),
     path('sms',temp),
-    path('payment',payment,name='payment')
+    path('payment',payment,name='payment'),
+    path('temp',temp,name="temp"),
+    path('success',success,name="success")
 
     # path('addemailpass',asyncRequest,name = 'sendVerificationLink'),
 ]

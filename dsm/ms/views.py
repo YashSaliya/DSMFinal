@@ -310,7 +310,29 @@ def payment(request):
             fuser=auth.get_user(x.id)
             phn=fuser.phone_number
             name=fields['f_name']
-            
+
 
 
     return render(request,'payment.html')
+
+import razorpay
+def temp(request):
+    if request.method=='POST':
+
+        client = razorpay.Client(auth=("zp_test_lezAm5i0u03U9P", "zJWdgs3O4eRAJWRHJygB6Gqa"))
+        
+        DATA = {
+            "amount": 100,
+            "currency": "INR",
+            "receipt": "receipt#1",
+            "notes": {
+                "key1": "value3",
+                "key2": "value2"
+            }
+        }
+        payment=client.order.create(data=DATA)
+    return render(request,'temp.html')
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+def success(request):
+    return HttpResponse("Done")
