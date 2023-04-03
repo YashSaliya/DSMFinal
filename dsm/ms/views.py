@@ -20,6 +20,7 @@ from dsm.settings import apikey
 from django.shortcuts import render
 from firebase_admin import auth
 import random
+import pickle
 from twilio.rest import Client
 cred = firebase_admin.credentials.Certificate("certificate.json")
 
@@ -104,6 +105,7 @@ def otherdetails(request):
             
             ms_doc = db.collection(data["district"]).document("milkSociety")
             ms=ms_doc.collection(u"district_ms").document(request.session['user'])
+            data['counter'] = 0
             ms.set(data)
 
             return render(request, 'index.html')
@@ -229,6 +231,7 @@ def notification(request):
                 'milk_type':data['milk_type'],
                 'qty':data['milk_qty'],
                 'shift':data['shift'],
+                'start_date': datetime.combine(data['start_date'],datetime.min.time()),
                 'end_date':datetime.combine(data['end_date'], datetime.min.time()),
                 'url':url,
                 'status':'Farmer Verification Pending'
@@ -303,6 +306,8 @@ def payment(request):
     key=db.collection("Cluster_key").document(request.session['user']).get().get("key")
     c=db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
         collection('Contract').get()
+    
+    opts = []
     for x in c:
         
         fields=x.to_dict()
@@ -310,8 +315,32 @@ def payment(request):
             fuser=auth.get_user(x.id)
             phn=fuser.phone_number
             name=fields['f_name']
+<<<<<<< HEAD
+=======
+            opts.append((x.id, fields['token']))    
+    
+    form = paymentForm()
+    form.fields['name'].choices = opts
+    rate = db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+        get().get('fatperkilorate')
 
 
+    if request.method != 'POST':
+        return render(request,'payment.html',context= {'form':form,'rate':json.dumps(rate)})
+
+    return render(request,'payment.html')
+
+
+
+def loadModel(start):
+    baseNumber = 157 # For 2019 start 
+>>>>>>> 4361d79dcf23999d26f5ba1c991f6a4a51f4c645
+
+    #calculate weeknumber from date 
+    def getWeekNumber(date):
+        return date.isocalendar()[1]
+
+<<<<<<< HEAD
 
     return render(request,'payment.html')
 
@@ -336,3 +365,31 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def success(request):
     return HttpResponse("Done")
+=======
+    #calculate year from date
+    def getYear(date):
+        return date.isocalendar()[0]
+
+    startDate = baseNumber +  52 * (getYear(start)-2019) + (getWeekNumber(start))
+    endDate = startDate + 5
+
+    #load model
+    loaded_model = pickle.load(open('sarima_model.pkl', 'rb'))
+
+    res = loaded_model.predict(start = startDate,end = endDate,dynamic = True)
+
+    return res.values
+
+
+
+def prediction(request):
+    if request.method != 'POST':
+        return render(request,'prediction.html')
+    else:
+        start = request.POST['startDate']
+        start = datetime.strptime(start, '%Y-%m-%d')
+        res = loadModel(start)
+        print(res)
+        return render(request,'prediction.html',{'res':res})
+        
+>>>>>>> 4361d79dcf23999d26f5ba1c991f6a4a51f4c645

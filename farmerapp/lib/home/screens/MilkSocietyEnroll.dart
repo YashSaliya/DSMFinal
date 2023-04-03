@@ -66,6 +66,7 @@ class _MilkSocietyEnrollState extends State<MilkSocietyEnroll> {
                               const Text("Select Shift"),
                               DropdownButton<String>(
                                 value: shiftSelected,
+                                isExpanded: true,
                                 onChanged: (String? newValue) {
                                   setState(() {
                                     shiftSelected = newValue!;
@@ -83,11 +84,13 @@ class _MilkSocietyEnrollState extends State<MilkSocietyEnroll> {
                                 }).toList(),
                               ),
                               const Text("Select Animal"),
+
                               DropdownButton<String>(
                                 value: animalSelected,
-                                onChanged: (String? newValue) {
+                                isExpanded: true,
+                                onChanged: (newValue) {
                                   setState(() {
-                                    animalSelected = newValue!;
+                                    animalSelected = newValue??"";
                                   });
                                 },
                                 items: <String>[
@@ -113,7 +116,7 @@ class _MilkSocietyEnrollState extends State<MilkSocietyEnroll> {
                 }
               }
               return const Center(
-                child: Text("Something went wrong"),
+                child: CircularProgressIndicator(),
               );
             }));
   }
@@ -166,4 +169,41 @@ class _MilkSocietyEnrollState extends State<MilkSocietyEnroll> {
       return ds.exists;
     });
   }
+
+
+  Widget makeInput(
+      {label, keyboardtype, required TextEditingController controller}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+              fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black87),
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        TextField(
+          controller: controller,
+          keyboardType: keyboardtype,
+          decoration: InputDecoration(
+            contentPadding:
+            const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.grey[400]!,
+              ),
+            ),
+            border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[400]!)),
+          ),
+        ),
+        const SizedBox(
+          height: 30,
+        )
+      ],
+    );
+  }
+
 }

@@ -38,6 +38,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
 FIREBASE_API_KEY = ""
 # Application definition
 

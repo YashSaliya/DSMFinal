@@ -234,13 +234,14 @@ function create_card(fid,name,qty,milk_type,shift,fd,address) {
 }
 
 function myfun(){
-  
+
   var startdate = document.getElementById("id_start_date").value;
   var duration = document.getElementById("id_duration").value;
   var enddate = new Date(startdate);
-  enddate.setMonth(parseInt(enddate.getMonth()) + parseInt(duration));
+  enddate.setMonth(enddate.getMonth() + parseInt(duration));
   let timestamp = new Date(enddate);
-  let date = timestamp.toLocaleDateString();
+  let date = timestamp.toLocaleDateString('fr-CA');
+
   document.getElementById("id_end_date").value = date;
 }
 

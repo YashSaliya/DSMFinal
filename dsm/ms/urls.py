@@ -12,8 +12,12 @@ urlpatterns = [
     path('contract',contract,name='contract'),
     path('sms',temp),
     path('payment',payment,name='payment'),
+<<<<<<< HEAD
     path('temp',temp,name="temp"),
     path('success',success,name="success")
+=======
+    path('prediction',prediction,name = 'prediction')
+>>>>>>> 4361d79dcf23999d26f5ba1c991f6a4a51f4c645
 
     # path('addemailpass',asyncRequest,name = 'sendVerificationLink'),
 ]

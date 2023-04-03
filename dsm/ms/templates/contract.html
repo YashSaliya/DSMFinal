@@ -87,7 +87,7 @@
                           
                           <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn bg-gradient-primary">Make Contract</button>
+                            <button type="submit" class="btn bg-gradient-primary">Terminate Contract</button>
                           </div>
                       </form>
                   </div>
@@ -243,7 +243,7 @@ cardBody.appendChild(cardText);
 
 var cardText = document.createElement("p");
 cardText.className = "card-text";
-var today=new Date()
+var today=data['start_date'].toDate() > new Date() ? data['start_date'].toDate() : new Date();
 var diff = rt-today;
 var diffInDays = Math.ceil(diff / 86400000);
 cardText.innerHTML = "Contract Validity(days): "+diffInDays
