@@ -1,5 +1,6 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, prefer_const_constructors, must_be_immutable
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmerapp/home/screens/ListMilkSocietiesScreen.dart';
 import 'package:farmerapp/home/screens/ShowContracts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,7 +12,26 @@ import '../register.dart';
 
 class AppDrawer extends StatelessWidget {
   final String? cityVal;
-  const AppDrawer({Key? key, required this.cityVal}) : super(key: key);
+  String user = "";
+
+  AppDrawer({Key? key, required this.cityVal}) : super(key: key);
+
+  checkUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId') ?? "";
+    var user = userId.toString();
+    return user;
+  }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   init();
+  // }
+
+  Future<void> init() async {
+    user = (await checkUser())!;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +39,25 @@ class AppDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          const DrawerHeader(
-            child: Text('Drawer Header'),
+          UserAccountsDrawerHeader(
+            accountName: Text("hey"),
+            accountEmail: null,
+            currentAccountPicture: CircleAvatar(
+              child: ClipOval(
+                child: Image.network(
+                  'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
+                  fit: BoxFit.cover,
+                  width: 90,
+                  height: 90,
+                ),
+              ),
+            ),
             decoration: BoxDecoration(
               color: Colors.blue,
+              image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: NetworkImage(
+                      'https://oflutter.com/wp-content/uploads/2021/02/profile-bg3.jpg')),
             ),
           ),
           ListTile(
@@ -56,7 +91,10 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Notifications'),
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => newContracts(cityVal: cityVal?? "",)));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => newContracts(
+                        cityVal: cityVal ?? "",
+                      )));
             },
           ),
         ],

@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, prefer_const_constructors
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ class ContractCard extends StatelessWidget {
           onPressed: () async {
             String url = ds.get('url');
             var uri = Uri.parse(url);
-            await launchUrl(uri,mode: LaunchMode.externalApplication);
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
             // final file = await loadPdfFromNetwork(url);
             // openPdf(context, file, url);
           },

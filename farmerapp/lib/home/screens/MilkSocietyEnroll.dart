@@ -21,6 +21,7 @@ class _MilkSocietyEnrollState extends State<MilkSocietyEnroll> {
   bool isEnrolled = false;
   late String uid;
   late String key;
+  bool prechecker = false;
 
   late SharedPreferences prefs;
 
@@ -32,93 +33,83 @@ class _MilkSocietyEnrollState extends State<MilkSocietyEnroll> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  Future<void> init() async {
+    prechecker = (await precheck())!;
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: const Text("Enroll Milk Society"),
         ),
-        body: FutureBuilder(
-            future: precheck(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasData) {
-                  bool t = snapshot.data as bool;
-                  if (t) {
-                    return Column(
-                      children: [
-                        Container(child: MilkSocietyDetails(ms: ms)),
-                        const Center(
-                            child: Text(
-                                "You have already applied in this society")),
-                      ],
-                    );
-                  } else {
-                    return Column(
-                      children: [
-                        Container(child: MilkSocietyDetails(ms: ms)),
-                        Container(
-                          child: Column(
-                            children: [
-                              const Text("Select Shift"),
-                              DropdownButton<String>(
-                                value: shiftSelected,
-                                isExpanded: true,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    shiftSelected = newValue!;
-                                  });
-                                },
-                                items: <String>[
-                                  "Morning",
-                                  "Evening",
-                                  "Both"
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                              ),
-                              const Text("Select Animal"),
-
-                              DropdownButton<String>(
-                                value: animalSelected,
-                                isExpanded: true,
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    animalSelected = newValue??"";
-                                  });
-                                },
-                                items: <String>[
-                                  "Cow",
-                                  "Buffalo"
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                              ),
-                              ElevatedButton(
-                                onPressed: isEnrolled ? null : enroll,
-                                child: const Text("Enroll"),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                }
-              }
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }));
+        body: Column(children: [
+          if (prechecker) ...[
+            Column(
+              children: [
+                Container(child: MilkSocietyDetails(ms: ms)),
+                const Center(
+                    child: Text("You have already applied in this society")),
+              ],
+            )
+          ] else ...[
+            Column(
+              children: [
+                Container(child: MilkSocietyDetails(ms: ms)),
+                Container(
+                  child: Column(
+                    children: [
+                      const Text("Select Shift"),
+                      DropdownButton<String>(
+                        hint: Text(shiftSelected),
+                        isExpanded: true,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            shiftSelected = newValue!;
+                          });
+                        },
+                        items: <String>["Morning", "Evening", "Both"]
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                      const Text("Select Animal"),
+                      DropdownButton<String>(
+                        value: animalSelected,
+                        isExpanded: true,
+                        onChanged: (newValue) {
+                          setState(() {
+                            animalSelected = newValue ?? "";
+                          });
+                        },
+                        items: <String>["Cow", "Buffalo"]
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                      ElevatedButton(
+                        onPressed: isEnrolled ? null : enroll,
+                        child: const Text("Enroll"),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          ]
+        ]));
   }
 
   void enroll() {
@@ -170,7 +161,6 @@ class _MilkSocietyEnrollState extends State<MilkSocietyEnroll> {
     });
   }
 
-
   Widget makeInput(
       {label, keyboardtype, required TextEditingController controller}) {
     return Column(
@@ -189,7 +179,7 @@ class _MilkSocietyEnrollState extends State<MilkSocietyEnroll> {
           keyboardType: keyboardtype,
           decoration: InputDecoration(
             contentPadding:
-            const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
                 color: Colors.grey[400]!,
@@ -205,5 +195,4 @@ class _MilkSocietyEnrollState extends State<MilkSocietyEnroll> {
       ],
     );
   }
-
 }
