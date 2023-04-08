@@ -317,9 +317,44 @@ def payment(request):
             name=fields['f_name']
 
     #calculate weeknumber from date 
-    def getWeekNumber(date):
-        return date.isocalendar()[1]
+    
 
 
     return render(request,'payment.html')
+
+
+def loadModel(start):
+    baseNumber = 157
+    def getWeekNumber(date):
+        return date.isocalendar()[1]
+
+    #calculate year from date
+    def getYear(date):
+        return date.isocalendar()[0]
+
+    startDate = baseNumber +  52 * (getYear(start)-2019) + (getWeekNumber(start))
+    endDate = startDate + 5
+
+    #load model
+    loaded_model = pickle.load(open('sarima_model.pkl', 'rb'))
+
+    res = loaded_model.predict(start = startDate,end = endDate,dynamic = True)
+
+    return res.values.tolist()
+
+
+def prediction(request):
+    if request.method != 'POST':
+        return render(request,'prediction.html',{'res':[]})
+    else:
+        start = request.POST['startDate']
+        start = datetime.strptime(start, '%Y-%m-%d')
+        res = loadModel(start)
+        t = {}
+        for index,value in enumerate(res):
+            t[index+1] = round(value,2)
+        res = t
+        del(res[6])
+        return render(request,'prediction.html',{'res':res,'start':str(start)})
+        
 
