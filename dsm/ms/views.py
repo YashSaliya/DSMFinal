@@ -309,14 +309,24 @@ def payment(request):
     
     opts = []
     for x in c:
-        
         fields=x.to_dict()
+        print(fields)
         if fields['status']=="Completed":
             fuser=auth.get_user(x.id)
             phn=fuser.phone_number
             name=fields['f_name']
+            opts.append((x.id, fields['token']))
 
-    #calculate weeknumber from date 
+    form = paymentForm()
+    form.fields['name'].choices = opts
+    rate = db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+        get().get('fatperkilorate')
+
+
+    if request.method != 'POST':
+        return render(request,'payment.html',context= {'form':form,'rate':json.dumps(rate)})
+
+    return render(request,'payment.html')
     
 
 
