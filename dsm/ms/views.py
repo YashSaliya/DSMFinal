@@ -315,81 +315,11 @@ def payment(request):
             fuser=auth.get_user(x.id)
             phn=fuser.phone_number
             name=fields['f_name']
-<<<<<<< HEAD
-=======
-            opts.append((x.id, fields['token']))    
-    
-    form = paymentForm()
-    form.fields['name'].choices = opts
-    rate = db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
-        get().get('fatperkilorate')
-
-
-    if request.method != 'POST':
-        return render(request,'payment.html',context= {'form':form,'rate':json.dumps(rate)})
-
-    return render(request,'payment.html')
-
-
-
-def loadModel(start):
-    baseNumber = 157 # For 2019 start 
->>>>>>> 4361d79dcf23999d26f5ba1c991f6a4a51f4c645
 
     #calculate weeknumber from date 
     def getWeekNumber(date):
         return date.isocalendar()[1]
 
-<<<<<<< HEAD
 
     return render(request,'payment.html')
 
-import razorpay
-def temp(request):
-    if request.method=='POST':
-
-        client = razorpay.Client(auth=("zp_test_lezAm5i0u03U9P", "zJWdgs3O4eRAJWRHJygB6Gqa"))
-        
-        DATA = {
-            "amount": 100,
-            "currency": "INR",
-            "receipt": "receipt#1",
-            "notes": {
-                "key1": "value3",
-                "key2": "value2"
-            }
-        }
-        payment=client.order.create(data=DATA)
-    return render(request,'temp.html')
-from django.views.decorators.csrf import csrf_exempt
-@csrf_exempt
-def success(request):
-    return HttpResponse("Done")
-=======
-    #calculate year from date
-    def getYear(date):
-        return date.isocalendar()[0]
-
-    startDate = baseNumber +  52 * (getYear(start)-2019) + (getWeekNumber(start))
-    endDate = startDate + 5
-
-    #load model
-    loaded_model = pickle.load(open('sarima_model.pkl', 'rb'))
-
-    res = loaded_model.predict(start = startDate,end = endDate,dynamic = True)
-
-    return res.values
-
-
-
-def prediction(request):
-    if request.method != 'POST':
-        return render(request,'prediction.html')
-    else:
-        start = request.POST['startDate']
-        start = datetime.strptime(start, '%Y-%m-%d')
-        res = loadModel(start)
-        print(res)
-        return render(request,'prediction.html',{'res':res})
-        
->>>>>>> 4361d79dcf23999d26f5ba1c991f6a4a51f4c645
