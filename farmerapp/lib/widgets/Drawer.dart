@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../home/screens/TableChart.dart';
 import '../home/screens/notifications.dart';
 import '../register.dart';
 
@@ -45,13 +46,13 @@ class AppDrawer extends StatelessWidget {
             accountEmail: null,
             currentAccountPicture: CircleAvatar(
               child: ClipOval(
-                child: Image.network(
-                  'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
-                  fit: BoxFit.cover,
-                  width: 90,
-                  height: 90,
-                ),
-              ),
+                  // child: Image.network(
+                  //   'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
+                  //   fit: BoxFit.cover,
+                  //   width: 90,
+                  //   height: 90,
+                  // ),
+                  ),
             ),
             decoration: BoxDecoration(
               color: Colors.blue,
@@ -92,6 +93,14 @@ class AppDrawer extends StatelessWidget {
                   builder: (context) => newContracts(
                         cityVal: cityVal ?? "",
                       )));
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.table_chart),
+            title: const Text('Record View'),
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => DataTableDemo()));
             },
           ),
           ListTile(
