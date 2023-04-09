@@ -206,3 +206,12 @@ class MsRegistration(forms.Form):
         
     #     return cleaned_data
 
+class RouteForm(forms.Form):
+    numberOfVehicles = forms.IntegerField()
+    vehicleCapacities= forms.CharField(max_length = 100)
+    demandsepByComma = forms.CharField(max_length = 50)
+    def __init__(self:forms.Form,*args,**kwargs):
+        super(RouteForm,self).__init__(*args,**kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class':'form-control'})
+         
