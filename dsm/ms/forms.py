@@ -116,8 +116,10 @@ districts = [
     ('Valsad', 'Valsad')
 ]
 
-
-
+animal=[('Cow','Cow'),
+        ('Buffalo','Buffalo')
+]
+shift=[('Morning','Morning'),('Evening','Evening')]
 class RegisterForm(forms.Form):
     email = forms.EmailField(widget = forms.EmailInput)
     password = forms.CharField(widget = forms.PasswordInput,min_length=6,max_length=8)
@@ -138,7 +140,10 @@ class contract_terminate_detail(forms.Form):
             self.fields[field].widget.attrs.update({'class':'form-control'})
 
 class paymentForm(forms.Form):
-    name = forms.ChoiceField(choices = [('1','1')])
+    name = forms.ChoiceField()
+    date = forms.DateField(widget = forms.DateInput(attrs={'type':'date'}))
+    shift=forms.ChoiceField(choices=shift)
+    milktype=forms.ChoiceField(choices=animal)
     fatpercent = forms.FloatField()
     qty = forms.FloatField(widget = forms.NumberInput(attrs = {'oninput':'myfun()'}))
     amount = forms.FloatField(widget = forms.TextInput(attrs = {'readonly':'readonly'}))
@@ -147,6 +152,7 @@ class paymentForm(forms.Form):
         # options = args[0]
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
+            self.fields['qty'].label="Qty(Ltr)"
 
 class contract_details(forms.Form):
 
@@ -188,14 +194,17 @@ class MsRegistration(forms.Form):
     storage_capacity = forms.FloatField()
     minFatCow = forms.FloatField()
     minFatBuffalo = forms.FloatField()
+    cowfatperkilorate = forms.FloatField()
+    buffatperkilorate = forms.FloatField()
     latitude = forms.FloatField(widget=forms.HiddenInput())
     longitude = forms.FloatField(widget=forms.HiddenInput())
-    fatperkilorate = forms.FloatField()
     def __init__(self:forms.Form,*args,**kwargs):
         super(MsRegistration,self).__init__(*args,**kwargs)
         self.fields['entity'].initial="milkSociety"
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class':'form-control'})
+            self.fields['cowfatperkilorate'].label='Cow milk Fat/kg (Rs)'
+            self.fields['buffatperkilorate'].label='Buffalo milk Fat/kg (Rs)'
             
     # def clean(self):
     #     cleaned_data = super().clean()

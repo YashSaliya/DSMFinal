@@ -9,7 +9,7 @@
     <div class = "card">
         <div class = "card-title"> <h2 class=" mt-3 mb-4 display-4 text-center">Payment Details</h2>   </div>
         <div class = "card-body"> 
-            <form id="my-form" class = "form-container" method = "POST">
+            <form id="my-form" class = "form-container" method = "POST" action= "{% url 'payment' %}">
                 {% csrf_token %}
                 {% for field in form %}
                     <div class = "form form-group">
@@ -20,7 +20,7 @@
                     </div>
                 {% endfor %}
                 <div style = "text-align: center;" class = "form form-group mt-2">
-                    <button type = "button" class = "btn btn-primary">Submit</button>
+                    <button type = "submit" class = "btn btn-primary">Submit</button>
                     <h6></h6>
                 </div>
             </form>
@@ -32,7 +32,13 @@
     function myfun(){
         var quantity = document.getElementById('id_qty').value;
         var fatpercent = document.getElementById('id_fatpercent').value;
-        var rate  = parseInt(JSON.parse('{{rate|escapejs}}'))
+        var animal=document.getElementById('id_milktype').value;
+        if(animal=="Cow"){
+            var rate  = parseInt(JSON.parse('{{cowrate|escapejs}}'))
+        }
+        else{
+            var rate  = parseInt(JSON.parse('{{bufrate|escapejs}}'))
+        }
 
         var amount =  quantity * (rate / (1000 / (fatpercent * 10)))  
         document.getElementById('id_amount').value = amount;

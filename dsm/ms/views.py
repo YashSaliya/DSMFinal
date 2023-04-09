@@ -25,8 +25,8 @@ from twilio.rest import Client
 
  
 
-from ortools.constraint_solver import routing_enums_pb2
-from ortools.constraint_solver import pywrapcp
+# from ortools.constraint_solver import routing_enums_pb2
+# from ortools.constraint_solver import pywrapcp
 
 
 cred = firebase_admin.credentials.Certificate("certificate.json")
@@ -311,34 +311,84 @@ def temp(request):
 
 def payment(request):
     key=db.collection("Cluster_key").document(request.session['user']).get().get("key")
-    c=db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
-        collection('Contract').get()
-    
-    opts = []
-    for x in c:
-        fields=x.to_dict()
-        print(fields)
-        if fields['status']=="Completed":
-            fuser=auth.get_user(x.id)
-            phn=fuser.phone_number
-            name=fields['f_name']
-            opts.append((x.id, fields['token']))
-
-    form = paymentForm()
-    form.fields['name'].choices = opts
-    rate = db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
-        get().get('fatperkilorate')
-
+    cowrate = db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+            get().get('cowfatperkilorate')
+    bufrate = db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+            get().get('buffatperkilorate')
 
     if request.method != 'POST':
-        return render(request,'payment.html',context= {'form':form,'rate':json.dumps(rate)})
+        c=db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+            collection('Contract').get()
+        
+        opts = []
+        for x in c:
+            fields=x.to_dict()
+            print(fields)
+            if fields['status']=="Completed":
+                fuser=auth.get_user(x.id)
+                phn=fuser.phone_number
+                name=fields['f_name']
+                opts.append((x.id, fields['token']))
 
-    return render(request,'payment.html')
-    
+        form = paymentForm()
+        form.fields['name'].choices = opts
 
 
-    return render(request,'payment.html')
+        return render(request,'payment.html',context= {'form':form,'cowrate':json.dumps(cowrate),'bufrate':json.dumps(bufrate)})
+    else:
+        
+        form=paymentForm(request.POST)
+        temp=request.POST.get('name')
+        form.fields['name'].choices=[(temp,temp)]
+        if form.is_valid():
+            data=form.cleaned_data
+            f_name=db.collection(key).document("milkSociety").collection('district_farmer').document(data['name']).\
+                get().get("full_name")
+            token=db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+                collection('Contract').document(data['name']).get().get('token')
+            ms_name=db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+               get().get('name')
+            record=db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+            collection('Records')
+            d={
+                'name':str(token)+"/"+f_name,
+                'milktype':data['milktype'],
+                'fatpercent':data['fatpercent'],
+                'qty':data['qty'],
+                'amt':data['amount'],
+                'shift':data['shift'],
+                'date':datetime.combine(data['date'],datetime.min.time())
+            }
+            if data['milktype']=='Cow':
+                d['rate']=cowrate
+            else:
+                d['rate']=bufrate
+            record.add(d)
+            f_record=db.collection(key).document("milkSociety").collection('district_farmer').document(data['name']).\
+                collection("Records")
+            d['name']=ms_name
+            f_record.add(d)
+            return render(request,'payment.html',context= {'form':form,'cowrate':json.dumps(cowrate),'bufrate':json.dumps(bufrate)})
 
+            
+
+
+            
+        else:
+            messages.error(request,message = form.errors)
+            return render(request,'payment.html',context= {'form':form,'cowrate':json.dumps(cowrate),'bufrate':json.dumps(bufrate)})
+
+def records(request):
+    key=db.collection("Cluster_key").document(request.session['user']).get().get("key")
+    records = db.collection(key).document("milkSociety").collection('district_ms').document(request.session['user']).\
+        collection("Records").stream()
+    documents=[]
+    for doc in records:
+        documents.append(doc.to_dict())
+    for i in range(0,len(documents)):
+        documents[i]['date']=documents[i]['date'].strftime('%Y-%m-%d')
+
+    return render(request,'record.html',{'documents':documents})
 
 def loadModel(start):
     baseNumber = 157
