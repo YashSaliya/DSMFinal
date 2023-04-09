@@ -13,9 +13,9 @@ urlpatterns = [
     path('sms',temp),
     path('payment',payment,name='payment'),
     path('temp',temp,name="temp"),
-    path('prediction',prediction,name = 'prediction'),
     path('route',routes,name = 'route'),
     path('record',records,name = 'record')
-
+    path('prediction',pred,name = 'prediction'),
+    path('route',routes,name = 'route')
     # path('addemailpass',asyncRequest,name = 'sendVerificationLink'),
 ]

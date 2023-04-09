@@ -22,6 +22,7 @@ from firebase_admin import auth
 import random
 import pickle
 from twilio.rest import Client
+import urllib.request
 
  
 
@@ -410,6 +411,20 @@ def loadModel(start):
     return res.values.tolist()
 
 
+def ld(start):
+    baseNumber = 157
+    def getWeekNumber(date):
+        return date.isocalendar()[1]
+
+    #calculate year from date
+    def getYear(date):
+        return date.isocalendar()[0]
+
+    startDate = baseNumber +  52 * (getYear(start)-2019) + (getWeekNumber(start))
+    endDate = startDate + 5
+    return startDate
+
+
 def prediction(request):
     if request.method != 'POST':
         return render(request,'prediction.html',{'res':[]})
@@ -423,6 +438,51 @@ def prediction(request):
         res = t
         del(res[6])
         return render(request,'prediction.html',{'res':res,'start':str(start)})
+
+
+def pred(request):
+    if request.method != 'POST':
+        return render(request,'prediction.html',{'res':[]})
+    else:
+        start = request.POST['startDate']
+        start = datetime.strptime(start, '%Y-%m-%d')
+        res = ld(start)
+
+        data = {'start':res}
+
+        body = str.encode(json.dumps(data))
+
+        url = 'https://mlpro-zyzuw.eastus2.inference.ml.azure.com/score'
+        # Replace this with the primary/secondary key or AMLToken for the endpoint
+        api_key = 'mbc0xhDbQifrCgAPehVvuVaSIFVpjulU'
+        if not api_key:
+            raise Exception("A key should be provided to invoke the endpoint")
+
+        # The azureml-model-deployment header will force the request to go to a specific deployment.
+        # Remove this header to have the request observe the endpoint traffic rules
+        headers = {'Content-Type':'application/json', 'Authorization':('Bearer '+ api_key), 'azureml-model-deployment': 'sarimax-1' }
+
+        req = urllib.request.Request(url, body, headers)
+
+        try:
+            response = urllib.request.urlopen(req)
+
+            result = response.read()
+            result = json.loads(json.loads(result))
+            arr = result['result']
+            result = {}
+            for index,value in enumerate(arr):
+                result[index+1] = round(value,2)
+            del(result[6])
+            return render(request,'prediction.html',{'res':result,'start':str(request.POST['startDate'])})
+        except urllib.error.HTTPError as error:
+            print("The request failed with status code: " + str(error.code))
+
+            # Print the headers - they include the requert ID and the timestamp, which are useful for debugging the failure
+            print(error.info())
+            print(error.read().decode("utf8", 'ignore'))
+
+
 
 def create_data_model():
     """Stores the data for the problem."""
