@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmerapp/home/screens/ListMilkSocietiesScreen.dart';
 import 'package:farmerapp/home/screens/ShowContracts.dart';
+import 'package:farmerapp/home/screens/ProfileScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,16 +62,40 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
+              leading: Icon(Icons.location_city),
               title: const Text('Milk Societies'),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => ListMSScreen(cityVal: cityVal)));
               }),
           ListTile(
-            title: const Text('Update Profile Details'),
-            onTap: () {},
+            leading: Icon(Icons.person),
+            title: const Text('My Profile'),
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => ProfileScreen()));
+            },
           ),
           ListTile(
+            leading: Icon(Icons.assignment),
+            title: const Text('Contracts'),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => ShowContracts(cityVal: cityVal)));
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.notifications_active_rounded),
+            title: const Text('Notifications'),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => newContracts(
+                        cityVal: cityVal ?? "",
+                      )));
+            },
+          ),
+          ListTile(
+              leading: Icon(Icons.logout),
               title: const Text('Logout'),
               onTap: () async {
                 SharedPreferences sh = await SharedPreferences.getInstance();
@@ -81,22 +106,6 @@ class AppDrawer extends StatelessWidget {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => const Register()));
               }),
-          ListTile(
-            title: const Text('Contracts'),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ShowContracts(cityVal: cityVal)));
-            },
-          ),
-          ListTile(
-            title: const Text('Notifications'),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => newContracts(
-                        cityVal: cityVal ?? "",
-                      )));
-            },
-          ),
         ],
       ),
     );
