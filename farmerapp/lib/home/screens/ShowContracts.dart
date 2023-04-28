@@ -7,7 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ShowContracts extends StatefulWidget {
   final String? cityVal;
-  const ShowContracts({Key? key, this.cityVal}) : super(key: key);
+  final String id;
+  const ShowContracts({Key? key, this.cityVal, required this.id})
+      : super(key: key);
 
   @override
   _ShowContractsState createState() => _ShowContractsState();
@@ -16,15 +18,20 @@ class ShowContracts extends StatefulWidget {
 class _ShowContractsState extends State<ShowContracts> {
   late final CollectionReference _collectionReference;
 
-  Future<void> _precheck() async {
-    final SharedPreferences sh = await SharedPreferences.getInstance();
-    String? uid = sh.getString('userId');
+  void _precheck() {
     _collectionReference = FirebaseFirestore.instance
         .collection(widget.cityVal ?? "")
         .doc('milkSociety')
         .collection('district_farmer')
-        .doc(uid)
+        .doc(widget.id)
         .collection('Contract');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _precheck();
+    setState(() {});
   }
 
   @override
@@ -33,30 +40,21 @@ class _ShowContractsState extends State<ShowContracts> {
         appBar: AppBar(
           title: const Text("Contracts"),
         ),
-        body: FutureBuilder(
-            future: _precheck(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting ||
-                  snapshot.connectionState == ConnectionState.active) {
-                return const Center(child: CircularProgressIndicator());
-              } else {
-                return StreamBuilder<QuerySnapshot>(
-                  stream: _collectionReference.snapshots(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Text('Loading...');
-                    } else {
-                      List<DocumentSnapshot> ds = snapshot.data!.docs;
-                      return ListView(
-                        children: ds.map((DocumentSnapshot de) {
-                          return ContractCard(ds: de);
-                        }).toList(),
-                      );
-                    }
-                  },
-                );
-              }
-            }));
+        body: StreamBuilder<QuerySnapshot>(
+          stream: _collectionReference.snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) {
+              return const Text('Loading...');
+            } else {
+              List<DocumentSnapshot> ds = snapshot.data!.docs;
+              return ListView(
+                children: ds.map((DocumentSnapshot de) {
+                  return ContractCard(ds: de);
+                }).toList(),
+              );
+            }
+          },
+        ));
   }
 }

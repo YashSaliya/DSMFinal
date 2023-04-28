@@ -12,24 +12,44 @@ import '../home/screens/TableChart.dart';
 import '../home/screens/notifications.dart';
 import '../register.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   final String? cityVal;
-  String user = "";
 
   AppDrawer({Key? key, required this.cityVal}) : super(key: key);
 
+  @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  String user = "";
+  String? userId;
+  String? username;
+
   checkUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId') ?? "";
+    userId = prefs.getString('userId') ?? "";
     var user = userId.toString();
     return user;
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   init();
-  // }
+  Future<String> abc() async {
+    DocumentSnapshot temp;
+    temp = await FirebaseFirestore.instance
+        .collection(widget.cityVal ?? "")
+        .doc('milkSociety')
+        .collection('district_farmer')
+        .doc(userId)
+        .get();
+    print("hello" + temp['full_name'].toString());
+    return temp['full_name'].toString();
+  }
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
 
   Future<void> init() async {
     user = (await checkUser())!;
@@ -42,7 +62,16 @@ class AppDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           UserAccountsDrawerHeader(
-            accountName: Text("hey"),
+            accountName: FutureBuilder(
+                future: abc(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (snapshot.hasData) {
+                    return Text(snapshot.data);
+                  } else {
+                    return Text('');
+                  }
+                }),
             accountEmail: null,
             currentAccountPicture: CircleAvatar(
               child: ClipOval(
@@ -67,7 +96,8 @@ class AppDrawer extends StatelessWidget {
               title: const Text('Milk Societies'),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ListMSScreen(cityVal: cityVal)));
+                    builder: (context) =>
+                        ListMSScreen(cityVal: widget.cityVal)));
               }),
           ListTile(
             leading: Icon(Icons.person),
@@ -82,7 +112,8 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Contracts'),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ShowContracts(cityVal: cityVal)));
+                  builder: (context) =>
+                      ShowContracts(cityVal: widget.cityVal, id: userId!)));
             },
           ),
           ListTile(
@@ -91,7 +122,7 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => newContracts(
-                        cityVal: cityVal ?? "",
+                        cityVal: widget.cityVal ?? "",
                       )));
             },
           ),
