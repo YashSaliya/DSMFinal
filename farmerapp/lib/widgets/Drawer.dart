@@ -55,6 +55,21 @@ class _AppDrawerState extends State<AppDrawer> {
     user = (await checkUser())!;
   }
 
+  Future<String> getUserName()  async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('userId') ?? "";
+    return FirebaseFirestore.instance
+        .collection(widget.cityVal ?? "")
+        .doc('milkSociety')
+        .collection('district_farmer')
+        .doc(userId)
+        .get()
+        .then((value) {
+          print(value.data());
+          return value.data()!['full_name'].toString();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -63,13 +78,13 @@ class _AppDrawerState extends State<AppDrawer> {
         children: <Widget>[
           UserAccountsDrawerHeader(
             accountName: FutureBuilder(
-                future: abc(),
+                future: getUserName(),
                 builder:
                     (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                   if (snapshot.hasData) {
-                    return Text(snapshot.data);
+                    return Text("Hello "+ snapshot.data);
                   } else {
-                    return Text('');
+                    return Text('Hello');
                   }
                 }),
             accountEmail: null,
@@ -131,7 +146,7 @@ class _AppDrawerState extends State<AppDrawer> {
             title: const Text('Record View'),
             onTap: () {
               Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => DataTableDemo()));
+                  MaterialPageRoute(builder: (context) => DataTableDemo(cityVal:widget.cityVal ,)));
             },
           ),
           ListTile(
